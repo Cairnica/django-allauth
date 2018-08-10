@@ -1,11 +1,24 @@
 from django.urls import reverse
+from django.conf.urls import include, url
 from django.utils.http import urlencode
 
 from allauth.compat import parse_qsl
 from allauth.socialaccount.providers.base import Provider
-
+from allauth.utils import import_attribute
 
 class OAuthProvider(Provider):
+
+    @classmethod
+    def get_urlpatterns(cls):
+        login_view = import_attribute(cls.get_package() + '.views.oauth_login')
+        callback_view = import_attribute(cls.get_package() + '.views.oauth_callback')
+
+        urlpatterns = [
+            url('^login/$', login_view, name=cls.id + "_login"),
+            url('^login/callback/$', callback_view, name=cls.id + "_callback"),
+        ]
+
+        return [url('^' + cls.get_slug() + '/', include(urlpatterns))]
 
     def get_login_url(self, request, **kwargs):
         url = reverse(self.id + "_login")

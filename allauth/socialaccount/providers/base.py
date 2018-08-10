@@ -1,3 +1,4 @@
+from importlib import import_module
 from django.utils.encoding import python_2_unicode_compatible
 
 from allauth.account.models import EmailAddress
@@ -37,6 +38,14 @@ class Provider(object):
     @classmethod
     def get_slug(cls):
         return cls.slug or cls.id
+
+    @classmethod
+    def get_urlpatterns(cls):
+        try:
+            prov_mod = import_module(cls.get_package() + '.urls')
+        except ImportError:
+            return []
+        return getattr(prov_mod, 'urlpatterns', [])
 
     def get_login_url(self, request, next=None, **kwargs):
         """

@@ -1,6 +1,7 @@
 import json
 
 from django.conf import settings
+from django.conf.urls import url
 from django.core.exceptions import ImproperlyConfigured
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
@@ -20,6 +21,7 @@ from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 from allauth.utils import import_callable
 
 from .locale import get_default_locale_callable
+from . import views
 
 
 GRAPH_API_VERSION = getattr(settings, 'SOCIALACCOUNT_PROVIDERS', {}).get(
@@ -49,6 +51,12 @@ class FacebookProvider(OAuth2Provider):
     id = 'facebook'
     name = 'Facebook'
     account_class = FacebookAccount
+
+    @classmethod
+    def get_urlpatterns(cls):
+        return super().get_urlpatterns() + [
+            url(r'^facebook/login/token/$', views.login_by_token, name="facebook_login_by_token"),
+        ]
 
     def __init__(self, request):
         self._locale_callable_cache = None

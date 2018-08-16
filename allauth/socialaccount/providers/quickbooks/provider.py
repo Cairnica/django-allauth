@@ -6,7 +6,6 @@ from allauth.socialaccount.providers.base import (
     ProviderException,
 )
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class QuickBooksAccount(ProviderAccount):
@@ -27,32 +26,44 @@ class QuickBooksOAuth2Provider(OAuth2Provider):
     name = 'QuickBooks'
     account_class = QuickBooksAccount
 
+    access_token_url = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer'
+    authorize_url = 'https://appcenter.intuit.com/connect/oauth2'
+    profile_test = 'https://sandbox-accounts.platform.intuit.com/v1/openid_connect/userinfo' # NOQA
+    profile_url = 'https://accounts.platform.intuit.com/v1/openid_connect/userinfo'
+    profile_url_method = 'GET'
+    access_token_method = 'POST'
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = self.get_user_info(token)
+        extra_data = resp
+        return self.sociallogin_from_response(
+            request, extra_data)
+
+    def get_user_info(self, token):
+        auth_header = 'Bearer ' + token.token
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': auth_header,
+            'accept': 'application/json'
+        }
+        QBO_sandbox = self.get_settings().get('SANDBOX', False)
+        if QBO_sandbox:
+            r = requests.get(self.profile_test, headers=headers)
+        else:
+            r = requests.get(self.get_profile_url(request), headers=headers)
+
     def extract_uid(self, data):
         if 'sub' not in data:
-            raise ProviderException(
-                'QBO error', data
-            )
+            raise ProviderException('QBO error', data)
         return str(data['sub'])
 
     def get_profile_fields(self):
-        default_fields = ['address',
-                          'sub',
-                          'phoneNumber',
-                          'givenName',
-                          'familyName',
-                          'email',
-                          'emailVerified',
-                          ]
-        fields = self.get_settings().get('PROFILE_FIELDS',
-                                         default_fields)
+        default_fields = ['address', 'sub', 'phoneNumber', 'givenName', 'familyName', 'email', 'emailVerified', ]
+        fields = self.get_settings().get('PROFILE_FIELDS', default_fields)
         return fields
 
     def get_default_scope(self):
-        scope = ['openid',
-                 'com.intuit.quickbooks.accounting',
-                 'profile',
-                 'phone',
-                 ]
+        scope = ['openid', 'com.intuit.quickbooks.accounting', 'profile', 'phone', ]
         if app_settings.QUERY_EMAIL:
             scope.append('email')
         return scope

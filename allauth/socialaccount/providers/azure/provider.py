@@ -1,8 +1,13 @@
 from __future__ import unicode_literals
 
+import requests
+
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
+
+
+LOGIN_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0'
+GRAPH_URL = 'https://graph.microsoft.com/v1.0'
 
 
 class AzureAccount(ProviderAccount):
@@ -26,6 +31,14 @@ class AzureProvider(OAuth2Provider):
     name = 'Azure'
     account_class = AzureAccount
 
+    access_token_url = LOGIN_URL + '/token'
+    authorize_url = LOGIN_URL + '/authorize'
+    profile_url = 'https://graph.microsoft.com/v1.0/me'
+
+    # Can be used later to obtain group data. Needs 'Group.Read.All' or similar.
+    # See https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/api/user_list_memberof  # noqa
+    groups_url = GRAPH_URL + '/me/memberOf?$select=displayName'
+
     def get_default_scope(self):
         """
         Doc on scopes available at
@@ -44,6 +57,32 @@ class AzureProvider(OAuth2Provider):
                     username=email,
                     last_name=data.get('surname'),
                     first_name=data.get('givenName'))
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'Bearer {0}'.format(token.token)}
+        extra_data = {}
+
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+
+        # See:
+        #
+        # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_get  # noqa
+        #
+        # example of what's returned (in python format)
+        #
+        # {u'displayName': u'John Smith', u'mobilePhone': None,
+        #  u'preferredLanguage': u'en-US', u'jobTitle': u'Director',
+        #  u'userPrincipalName': u'john@smith.com',
+        #  u'@odata.context':
+        #  u'https://graph.microsoft.com/v1.0/$metadata#users/$entity',
+        #  u'officeLocation': u'Paris', u'businessPhones': [],
+        #  u'mail': u'john@smith.com', u'surname': u'Smith',
+        #  u'givenName': u'John', u'id': u'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'}
+
+        profile_data = resp.json()
+        extra_data.update(profile_data)
+
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [AzureProvider]

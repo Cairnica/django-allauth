@@ -3,13 +3,9 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class MailChimpAccount(ProviderAccount):
-
-    """ProviderAccount subclass for MailChimp."""
-
     def get_profile_url(self):
         """Return base profile url."""
         return self.account.extra_data['api_endpoint']
@@ -20,12 +16,20 @@ class MailChimpAccount(ProviderAccount):
 
 
 class MailChimpProvider(OAuth2Provider):
-
-    """OAuth2Provider subclass for MailChimp v3."""
-
     id = 'mailchimp'
     name = 'MailChimp'
     account_class = MailChimpAccount
+
+    authorize_url = 'https://login.mailchimp.com/oauth2/authorize'
+    access_token_url = 'https://login.mailchimp.com/oauth2/token'
+    profile_url = 'https://login.mailchimp.com/oauth2/metadata'
+
+    def complete_login(self, request, app, token, **kwargs):
+        """Complete login, ensuring correct OAuth header."""
+        headers = {'Authorization': 'OAuth {0}'.format(token.token)}
+        metadata = requests.get(self.get_profile_url(request), headers=headers)
+        extra_data = metadata.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):
         """Extract uid ('user_id') and ensure it's a str."""

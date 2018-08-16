@@ -3,7 +3,6 @@ import requests
 from allauth.socialaccount.app_settings import STORE_TOKENS
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class EveOnlineAccount(ProviderAccount):
@@ -33,6 +32,10 @@ class EveOnlineProvider(OAuth2Provider):
     id = 'eveonline'
     name = 'EVE Online'
     account_class = EveOnlineAccount
+    
+    access_token_url = 'https://login.eveonline.com/oauth/token'
+    authorize_url = 'https://login.eveonline.com/oauth/authorize'
+    profile_url = 'https://login.eveonline.com/oauth/verify'
 
     def get_default_scope(self):
         scopes = []
@@ -45,6 +48,11 @@ class EveOnlineProvider(OAuth2Provider):
 
     def extract_common_fields(self, data):
         return dict(name=data.get('CharacterName'))
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.get_profile_url(request), headers={'Authorization': 'Bearer ' + token.token})
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [EveOnlineProvider]

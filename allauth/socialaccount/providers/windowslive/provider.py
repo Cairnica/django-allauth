@@ -4,7 +4,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class WindowsLiveAccount(ProviderAccount):
@@ -21,6 +20,27 @@ class WindowsLiveProvider(OAuth2Provider):
     id = str('windowslive')
     name = 'Live'
     account_class = WindowsLiveAccount
+    
+    access_token_url = 'https://login.live.com/oauth20_token.srf'
+    authorize_url = 'https://login.live.com/oauth20_authorize.srf'
+    profile_url = 'https://apis.live.net/v5.0/me'
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'Bearer {0}'.format(token.token)}
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+
+        # example of whats returned (in python format):
+        # {'first_name': 'James', 'last_name': 'Smith',
+        #  'name': 'James Smith', 'locale': 'en_US', 'gender': None,
+        #  'emails': {'personal': None, 'account': 'jsmith@example.com',
+        #  'business': None, 'preferred': 'jsmith@example.com'},
+        #  'link': 'https://profile.live.com/',
+        #  'updated_time': '2014-02-07T00:35:27+0000',
+        #  'id': '83605e110af6ff98'}
+
+        resp.raise_for_status()
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def get_default_scope(self):
         """

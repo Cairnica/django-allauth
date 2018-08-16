@@ -1,8 +1,8 @@
 import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
+from allauth.socialaccount.providers.oauth2.client import OAuth2Error
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class TwitchAccount(ProviderAccount):
@@ -21,6 +21,25 @@ class TwitchProvider(OAuth2Provider):
     id = 'twitch'
     name = 'Twitch'
     account_class = TwitchAccount
+    
+    access_token_url = 'https://api.twitch.tv/kraken/oauth2/token'
+    authorize_url = 'https://api.twitch.tv/kraken/oauth2/authorize'
+    profile_url = 'https://api.twitch.tv/kraken/user'
+
+    def complete_login(self, request, app, token, **kwargs):
+        params = {"oauth_token": token.token, "client_id": app.client_id}
+        response = requests.get(self.get_profile_url(request), params=params)
+
+        data = response.json()
+        if response.status_code >= 400:
+            error = data.get("error", "")
+            message = data.get("message", "")
+            raise OAuth2Error("Twitch API Error: %s (%s)" % (error, message))
+
+        if "_id" not in data:
+            raise OAuth2Error("Invalid data from Twitch API: %r" % (data))
+
+        return self.sociallogin_from_response(request, data)
 
     def extract_uid(self, data):
         return str(data['_id'])

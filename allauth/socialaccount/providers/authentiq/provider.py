@@ -4,7 +4,6 @@ from allauth.account.models import EmailAddress
 from allauth.socialaccount import app_settings
 from allauth.socialaccount.providers.base import AuthAction, ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class Scope(object):
@@ -41,6 +40,12 @@ class AuthentiqProvider(OAuth2Provider):
     id = 'authentiq'
     name = 'Authentiq'
     account_class = AuthentiqAccount
+
+    provider_url = 'https://connect.authentiq.io/'
+
+    access_token_url = '{provider_url}/token'
+    authorize_url = '{provider_url}/authorize'
+    profile_url = '{provider_url}/userinfo'
 
     def get_scope(self, request):
         scope = set(super(AuthentiqProvider, self).get_scope(request))
@@ -91,5 +96,12 @@ class AuthentiqProvider(OAuth2Provider):
             ret.append(EmailAddress(email=email, verified=True, primary=True))
         return ret
 
+    def complete_login(self, request, app, token, **kwargs):
+        auth = {'Authorization': 'Bearer ' + token.token}
+        resp = requests.get(self.get_profile_url(request), headers=auth)
+        resp.raise_for_status()
+        extra_data = resp.json()
+        login = self.sociallogin_from_response(request, extra_data)
+        return login
 
 provider_classes = [AuthentiqProvider]

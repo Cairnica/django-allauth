@@ -10,27 +10,19 @@ from allauth.utils import import_attribute
 from .views import OAuthLoginView, OAuthCallbackView
 
 class OAuthProvider(Provider):
-    adapter_class = None
     login_view_class = OAuthLoginView
     callback_view_class = OAuthCallbackView
 
-    def create_adapter(self, request):
-        return self.adapter_class(request, self)
-
     @cached_property
     def login_view(self):
-        if self.adapter_class:
-            return self.login_view_class.adapter_view(self)
-        return import_attribute(self.get_package() + '.views.oauth_login')
+        return self.login_view_class.adapter_view(self)
 
     @cached_property
     def callback_view(self):
-        if self.adapter_class:
-            return self.callback_view_class.adapter_view(self)
-        return import_attribute(self.get_package() + '.views.oauth_callback')
+        return self.callback_view_class.adapter_view(self)
 
     def get_urlpatterns(self):
-        slug = self.get_slug()
+        slug = self.slug
 
         urlpatterns = [
             url(r'^login/$', self.login_view, name=slug + "_login"),
@@ -40,7 +32,7 @@ class OAuthProvider(Provider):
         return [url('^' + slug + '/', include(urlpatterns))]
 
     def get_login_url(self, request, **kwargs):
-        url = reverse(self.id + "_login")
+        url = reverse(self.slug + "_login")
         if kwargs:
             url = url + '?' + urlencode(kwargs)
         return url
@@ -58,6 +50,12 @@ class OAuthProvider(Provider):
         # adapter into the provider. Hmpf, the line between
         # adapter/provider is a bit too thin here.
         return None
+
+    def complete_login(self, request, app):
+        """
+        Returns a SocialLogin instance
+        """
+        raise NotImplementedError
 
     def get_scope(self, request):
         settings = self.get_settings()

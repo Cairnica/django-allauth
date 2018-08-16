@@ -4,7 +4,6 @@ from allauth.account.models import EmailAddress
 from allauth.socialaccount import providers
 from allauth.socialaccount.providers.base import AuthAction, ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class SalesforceAccount(ProviderAccount):
@@ -24,6 +23,20 @@ class SalesforceProvider(OAuth2Provider):
     name = 'Salesforce'
     package = 'allauth.socialaccount.providers.salesforce'
     account_class = SalesforceAccount
+
+    @property
+    def base_url(self):
+        return self.get_app(self.request).key
+
+    authorize_url = '{base_url}/services/oauth2/authorize'
+    access_token_url = '{base_url}/services/oauth2/token'
+    profile_url = '{base_url}/services/oauth2/userinfo'
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.get_profile_url(request), params={'oauth_token': token})
+        resp.raise_for_status()
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def get_default_scope(self):
         return ['id', 'openid']

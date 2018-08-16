@@ -1,8 +1,7 @@
 import requests
 
-from allauth.socialaccount.providers.base import ProviderAccount
+from allauth.socialaccount.providers.base import ProviderAccount, ProviderException
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class DoubanAccount(ProviderAccount):
@@ -21,6 +20,10 @@ class DoubanProvider(OAuth2Provider):
     id = 'douban'
     name = 'Douban'
     account_class = DoubanAccount
+    
+    access_token_url = 'https://www.douban.com/service/auth2/token'
+    authorize_url = 'https://www.douban.com/service/auth2/auth'
+    profile_url = 'https://api.douban.com/v2/user/~me'
 
     def extract_uid(self, data):
         return data['id']
@@ -43,6 +46,26 @@ class DoubanProvider(OAuth2Provider):
             'username': data['id'],
             'first_name': data.get('name', ''),
         }
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'Bearer %s' % token.token}
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+        extra_data = resp.json()
+        """
+        Douban may return data like this:
+
+            {
+                'code': 128,
+                'request': 'GET /v2/user/~me',
+                'msg': 'user_is_locked:53358092'
+            }
+
+        """
+        if 'id' not in extra_data:
+            msg = extra_data.get('msg', _('Invalid profile data'))
+            raise ProviderException(msg)
+        return self.sociallogin_from_response(
+            request, extra_data)
 
 
 provider_classes = [DoubanProvider]

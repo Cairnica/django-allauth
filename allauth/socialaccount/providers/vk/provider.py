@@ -28,10 +28,37 @@ class VKAccount(ProviderAccount):
         return name or super(VKAccount, self).to_str()
 
 
+class VKOAuth2Adapter(OAuth2Adapter):
+    
+    access_token_url = 'https://oauth.vk.com/access_token'
+    authorize_url = 'https://oauth.vk.com/authorize'
+    profile_url = 'https://api.vk.com/method/users.get'
+
+    def complete_login(self, request, app, token, **kwargs):
+        uid = kwargs['response'].get('user_id')
+        params = {
+            'v': '3.0',
+            'access_token': token.token,
+            'fields': ','.join(USER_FIELDS),
+        }
+        if uid:
+            params['user_ids'] = uid
+        resp = requests.get(self.get_profile_url(request),
+                            params=params)
+        resp.raise_for_status()
+        extra_data = resp.json()['response'][0]
+        email = kwargs['response'].get('email')
+        if email:
+            extra_data['email'] = email
+        return self.sociallogin_from_response(request,
+                                                             extra_data)
+
+
 class VKProvider(OAuth2Provider):
     id = 'vk'
     name = 'VK'
     account_class = VKAccount
+    adapter_class = VKOAuth2Adapter
 
     def get_default_scope(self):
         scope = []

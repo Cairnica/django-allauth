@@ -3,7 +3,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class GitLabAccount(ProviderAccount):
@@ -23,6 +22,13 @@ class GitLabProvider(OAuth2Provider):
     id = 'gitlab'
     name = 'GitLab'
     account_class = GitLabAccount
+    
+    provider_base_url = 'https://gitlab.com'
+    provider_api_version = 'v4'
+
+    access_token_url = '{provider_base_url}/oauth/token'
+    authorize_url = '{provider_base_url}/oauth/authorize'
+    profile_url = '{provider_base_url}/api/{provider_api_version}/user'
 
     def extract_uid(self, data):
         return str(data['id'])
@@ -32,6 +38,16 @@ class GitLabProvider(OAuth2Provider):
             email=data.get('email'),
             username=data.get('username'),
             name=data.get('name'),
+        )
+
+    def complete_login(self, request, app, token, response):
+        extra_data = requests.get(self.get_profile_url(request), params={
+            'access_token': token.token
+        })
+
+        return self.sociallogin_from_response(
+            request,
+            extra_data.json()
         )
 
 

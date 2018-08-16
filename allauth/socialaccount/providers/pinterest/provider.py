@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class PinterestAccount(ProviderAccount):
@@ -19,6 +18,18 @@ class PinterestProvider(OAuth2Provider):
     id = 'pinterest'
     name = 'Pinterest'
     account_class = PinterestAccount
+    
+    provider_url = 'api.pinterest.com'
+    provider_api_version = 'v1'
+
+    access_token_url = 'https://{provider_url}/{provider_api_version}/oauth/token'
+    authorize_url = 'https://{provider_url}/oauth/'
+    profile_url = 'https://{provider_url}/{provider_api_version}/me'
+
+    def complete_login(self, request, app, token, **kwargs):
+        response = requests.get(self.get_profile_url(request), params={'access_token': token.token})
+        extra_data = response.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def get_default_scope(self):
         # See: https://developers.pinterest.com/docs/api/overview/#scopes

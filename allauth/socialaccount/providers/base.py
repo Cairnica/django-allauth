@@ -1,6 +1,11 @@
 from importlib import import_module
-from django.utils.encoding import python_2_unicode_compatible
+import functools
 
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
+from django.views.generic import View
+
+from allauth.exceptions import ImmediateHttpResponse
 from allauth.account.models import EmailAddress
 from allauth.socialaccount import app_settings
 
@@ -28,23 +33,47 @@ class ProviderException(Exception):
     pass
 
 
+def view_property(func):
+    @functools.wraps(func)
+    def new_func(self):
+        return func(self).adapter_view(self)
+    return cached_property(new_func)
+
+
 class Provider(object):
+    default_settings = None
 
-    slug = None
-
-    def __init__(self, request):
+    def __init__(self, factory, request=None):
+        self.factory = factory
         self.request = request
 
-    @classmethod
-    def get_slug(cls):
-        return cls.slug or cls.id
+    class Factory():
+        def __init__(self, ProviderClass, id=None):
+            self.id = id or Provider.__name__
+            self.provider_class = ProviderClass
 
-    def get_urlpatterns(cls):
-        try:
-            prov_mod = import_module(cls.get_package() + '.urls')
-        except ImportError:
-            return []
-        return getattr(prov_mod, 'urlpatterns', [])
+        @property
+        def slug(self):
+            return self.id
+
+        def create_provider(self, current_request):
+            return self.provider_class(current_request)
+
+        def get_urlpatterns(self):
+            try:
+                prov_mod = import_module(self.provider_class.get_package() + '.urls')
+            except ImportError:
+                return []
+            return getattr(prov_mod, 'urlpatterns', [])
+
+
+    @property
+    def id(self):
+        return self.factory.id
+
+    @property
+    def slug(self):
+        return self.factory.slug
 
     def get_login_url(self, request, next=None, **kwargs):
         """
@@ -69,7 +98,11 @@ class Provider(object):
         return self.account_class(social_account)
 
     def get_settings(self):
-        return app_settings.PROVIDERS.get(self.id, {})
+        return dict().update(self.default_settings, app_settings.PROVIDERS.get(self.id, {}))
+
+    @property
+    def settings(self):
+        return self.get_settings()
 
     def sociallogin_from_response(self, request, response):
         """
@@ -213,3 +246,17 @@ class ProviderAccount(object):
         fashion, without having to worry about @python_2_unicode_compatible
         """
         return self.get_brand()['name']
+
+
+class ProviderView(View):
+    @classmethod
+    def provider_view(cls, provider_factory):
+        def view(request, *args, **kwargs):
+            self = cls()
+            self.request = request
+            self.provider = provider_factory.create_provider(request)
+            try:
+                return self.dispatch(request, *args, **kwargs)
+            except ImmediateHttpResponse as e:
+                return e.response
+        return view

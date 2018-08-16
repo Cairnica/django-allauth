@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class DiscordAccount(ProviderAccount):
@@ -15,6 +14,10 @@ class DiscordProvider(OAuth2Provider):
     id = 'discord'
     name = 'Discord'
     account_class = DiscordAccount
+    
+    access_token_url = 'https://discordapp.com/api/oauth2/token'
+    authorize_url = 'https://discordapp.com/api/oauth2/authorize'
+    profile_url = 'https://discordapp.com/api/users/@me'
 
     def extract_uid(self, data):
         return str(data['id'])
@@ -28,6 +31,18 @@ class DiscordProvider(OAuth2Provider):
 
     def get_default_scope(self):
         return ['email', 'identify']
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {
+            'Authorization': 'Bearer {0}'.format(token.token),
+            'Content-Type': 'application/json',
+        }
+        extra_data = requests.get(self.get_profile_url(request), headers=headers)
+
+        return self.sociallogin_from_response(
+            request,
+            extra_data.json()
+        )
 
 
 provider_classes = [DiscordProvider]

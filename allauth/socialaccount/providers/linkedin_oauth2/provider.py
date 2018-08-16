@@ -6,7 +6,6 @@ from allauth.socialaccount.providers.base import (
     ProviderException,
 )
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class LinkedInOAuth2Account(ProviderAccount):
@@ -38,6 +37,25 @@ class LinkedInOAuth2Provider(OAuth2Provider):
     # Name is displayed to ordinary users -- don't include protocol
     name = 'LinkedIn'
     account_class = LinkedInOAuth2Account
+    
+    access_token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
+    authorize_url = 'https://www.linkedin.com/oauth/v2/authorization'
+    profile_url = 'https://api.linkedin.com/v1/people/~'
+    # See:
+    # http://developer.linkedin.com/forum/unauthorized-invalid-or-expired-token-immediately-after-receiving-oauth2-token?page=1 # noqa
+    access_token_method = 'GET'
+
+    def complete_login(self, request, app, token, **kwargs):
+        extra_data = self.get_user_info(token)
+        return self.sociallogin_from_response(
+            request, extra_data)
+
+    def get_user_info(self, token):
+        fields = self.get_profile_fields()
+        url = self.get_profile_url(request) + ':(%s)?format=json' % ','.join(fields)
+        resp = requests.get(url, headers={'Authorization': ' '.join(('Bearer', token.token)), 'x-li-src': 'msdk'})
+        resp.raise_for_status()
+        return resp.json()
 
     def extract_uid(self, data):
         if 'id' not in data:
@@ -56,8 +74,7 @@ class LinkedInOAuth2Provider(OAuth2Provider):
                           # picture-urls::(original) is higher res
                           'picture-urls::(original)',
                           'public-profile-url']
-        fields = self.get_settings().get('PROFILE_FIELDS',
-                                         default_fields)
+        fields = self.get_settings().get('PROFILE_FIELDS', default_fields)
         return fields
 
     def get_default_scope(self):

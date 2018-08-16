@@ -1,11 +1,13 @@
 import json
 
+from django.conf.urls import url
 from django.template.loader import render_to_string
 from django.utils.html import escapejs
 
 from allauth.account.models import EmailAddress
-from allauth.socialaccount.providers.base import Provider, ProviderAccount
+from allauth.socialaccount.providers.base import Provider, ProviderAccount, view_property
 
+from .views import PersonaLogin
 
 class PersonaAccount(ProviderAccount):
     def to_str(self):
@@ -16,6 +18,16 @@ class PersonaProvider(Provider):
     id = 'persona'
     name = 'Persona'
     account_class = PersonaAccount
+
+    class Factory(Provider.Factory):
+        @view_property
+        def persona_view(self):
+            return PersonaLogin
+
+        def get_urlpatterns(self):
+            return [
+                url('^persona/login/$', self.persona_view, name="persona_login")
+            ]
 
     def media_js(self, request):
         settings = self.get_settings()
@@ -35,9 +47,7 @@ class PersonaProvider(Provider):
         return dict(email=data['email'])
 
     def extract_email_addresses(self, data):
-        ret = [EmailAddress(email=data['email'],
-                            verified=True,
-                            primary=True)]
+        ret = [EmailAddress(email=data['email'], verified=True, primary=True)]
         return ret
 
 

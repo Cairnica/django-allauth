@@ -1,3 +1,8 @@
+import json
+
+from django.utils.http import urlencode
+
+from allauth.socialaccount.providers.oauth.client import OAuth
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth.provider import OAuthProvider
 
@@ -25,10 +30,33 @@ class FlickrAccount(ProviderAccount):
             .get('person').get('username').get('_content', dflt)
 
 
+class FlickrAPI(OAuth):
+
+    api_url = 'https://api.flickr.com/services/rest'
+
+    def get_user_info(self):
+        default_params = {'nojsoncallback': '1', 'format': 'json'}
+        p = dict({'method': 'flickr.test.login'}, **default_params)
+        u = json.loads(self.query(self.api_url + '?' + urlencode(p)))
+
+        p = dict({'method': 'flickr.people.getInfo', 'user_id': u['user']['id']}, **default_params)
+        user = json.loads(self.query(self.api_url + '?' + urlencode(p)))
+        return user
+
+
 class FlickrProvider(OAuthProvider):
     id = 'flickr'
     name = 'Flickr'
     account_class = FlickrAccount
+    
+    request_token_url = 'http://www.flickr.com/services/oauth/request_token'
+    access_token_url = 'http://www.flickr.com/services/oauth/access_token'
+    authorize_url = 'http://www.flickr.com/services/oauth/authorize'
+
+    def complete_login(self, request, app, token, response):
+        client = FlickrAPI(request, app.client_id, app.secret, self.request_token_url)
+        extra_data = client.get_user_info()
+        return self.sociallogin_from_response(request, extra_data)
 
     def get_default_scope(self):
         scope = []

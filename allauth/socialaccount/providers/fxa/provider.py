@@ -4,21 +4,9 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
-
-
-_FXA_SETTINGS = getattr(
-    settings, 'SOCIALACCOUNT_PROVIDERS', {}).get('fxa', {})
-FXA_OAUTH_ENDPOINT = _FXA_SETTINGS.get(
-    'OAUTH_ENDPOINT',
-    'https://oauth.accounts.firefox.com/v1')
-FXA_PROFILE_ENDPOINT = _FXA_SETTINGS.get(
-    'PROFILE_ENDPOINT',
-    'https://profile.accounts.firefox.com/v1')
 
 
 class FirefoxAccountsAccount(ProviderAccount):
-
     def to_str(self):
         return self.account.uid
 
@@ -27,6 +15,13 @@ class FirefoxAccountsProvider(OAuth2Provider):
     id = 'fxa'
     name = 'Firefox Accounts'
     account_class = FirefoxAccountsAccount
+    
+    OAUTH_ENDPOINT = 'https://oauth.accounts.firefox.com/v1'
+    PROFILE_ENDPOINT = 'https://oauth.accounts.firefox.com/v1'
+
+    access_token_url = '{OAUTH_ENDPOINT}/token'
+    authorize_url = '{OAUTH_ENDPOINT}/authorization'
+    profile_url = '{PROFILE_ENDPOINT}/profile'
 
     def get_default_scope(self):
         return ['profile']
@@ -36,6 +31,12 @@ class FirefoxAccountsProvider(OAuth2Provider):
 
     def extract_common_fields(self, data):
         return dict(email=data.get('email'))
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'Bearer {0}'.format(token.token)}
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [FirefoxAccountsProvider]

@@ -28,7 +28,7 @@ class XingOAuthAdapter(OAuthAdapter):
         client = XingAPI(request, app.client_id, app.secret,
                          self.request_token_url)
         extra_data = client.get_user_info()['users'][0]
-        return self.get_provider().sociallogin_from_response(request,
+        return self.sociallogin_from_response(request,
                                                              extra_data)
 
 

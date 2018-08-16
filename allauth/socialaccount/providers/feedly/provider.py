@@ -23,6 +23,11 @@ class FeedlyProvider(OAuth2Provider):
     id = str('feedly')
     name = 'Feedly'
     account_class = FeedlyAccount
+    
+    HOST = 'cloud.feedly.com'
+    access_token_url = 'https://{HOST}/v3/auth/token' % host
+    authorize_url = 'https://{HOST}/v3/auth/auth' % host
+    profile_url = 'https://{HOST}/v3/profile' % host
 
     def get_default_scope(self):
         return ['https://cloud.feedly.com/subscriptions']
@@ -34,6 +39,12 @@ class FeedlyProvider(OAuth2Provider):
         return dict(email=data.get('email'),
                     last_name=data.get('familyName'),
                     first_name=data.get('givenName'))
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'OAuth {0}'.format(token.token)}
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [FeedlyProvider]

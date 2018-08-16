@@ -3,7 +3,6 @@ import requests
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class KakaoAccount(ProviderAccount):
@@ -23,6 +22,16 @@ class KakaoProvider(OAuth2Provider):
     id = 'kakao'
     name = 'Kakao'
     account_class = KakaoAccount
+    
+    access_token_url = 'https://kauth.kakao.com/oauth/token'
+    authorize_url = 'https://kauth.kakao.com/oauth/authorize'
+    profile_url = 'https://kapi.kakao.com/v1/user/me'
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'Bearer {0}'.format(token.token)}
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):
         return str(data['id'])

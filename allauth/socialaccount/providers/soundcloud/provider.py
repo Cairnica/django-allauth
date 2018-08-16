@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class SoundCloudAccount(ProviderAccount):
@@ -23,6 +22,16 @@ class SoundCloudProvider(OAuth2Provider):
     id = 'soundcloud'
     name = 'SoundCloud'
     account_class = SoundCloudAccount
+    
+    access_token_url = 'https://api.soundcloud.com/oauth2/token'
+    authorize_url = 'https://soundcloud.com/connect'
+    profile_url = 'https://api.soundcloud.com/me.json'
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.get_profile_url(request),
+                            params={'oauth_token': token.token})
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):
         return str(data['id'])

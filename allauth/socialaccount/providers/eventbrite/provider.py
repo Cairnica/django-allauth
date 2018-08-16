@@ -4,11 +4,9 @@ import requests
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class EventbriteAccount(ProviderAccount):
-
     """ProviderAccount subclass for Eventbrite."""
 
     def get_avatar_url(self):
@@ -17,12 +15,13 @@ class EventbriteAccount(ProviderAccount):
 
 
 class EventbriteProvider(OAuth2Provider):
-
-    """OAuth2Provider subclass for Eventbrite."""
-
     id = 'eventbrite'
     name = 'Eventbrite'
     account_class = EventbriteAccount
+
+    authorize_url = 'https://www.eventbrite.com/oauth/authorize'
+    access_token_url = 'https://www.eventbrite.com/oauth/token'
+    profile_url = 'https://www.eventbriteapi.com/v3/users/me/'
 
     def extract_uid(self, data):
         """Extract uid ('id') and ensure it's a str."""
@@ -58,6 +57,11 @@ class EventbriteProvider(OAuth2Provider):
                                           primary=email.get("primary")))
 
         return addresses
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.get_profile_url(request), params={'token': token.token})
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [EventbriteProvider]

@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class EdmodoAccount(ProviderAccount):
@@ -17,6 +16,10 @@ class EdmodoProvider(OAuth2Provider):
     id = 'edmodo'
     name = 'Edmodo'
     account_class = EdmodoAccount
+    
+    access_token_url = 'https://api.edmodo.com/oauth/token'
+    authorize_url = 'https://api.edmodo.com/oauth/authorize'
+    profile_url = 'https://api.edmodo.com/users/me'
 
     def get_default_scope(self):
         return ['basic']
@@ -33,6 +36,11 @@ class EdmodoProvider(OAuth2Provider):
         return dict(user_type=data.get('type'),
                     profile_url=data.get('url'),
                     avatar_url=data.get('avatars').get('large'))
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.get_profile_url(request), params={'access_token': token.token})
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [EdmodoProvider]

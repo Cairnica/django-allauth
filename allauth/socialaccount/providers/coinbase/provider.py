@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class CoinbaseAccount(ProviderAccount):
@@ -20,6 +19,10 @@ class CoinbaseProvider(OAuth2Provider):
     name = 'Coinbase'
     account_class = CoinbaseAccount
 
+    authorize_url = 'https://coinbase.com/oauth/authorize'
+    access_token_url = 'https://coinbase.com/oauth/token'
+    profile_url = 'https://coinbase.com/api/v1/users'
+
     def get_default_scope(self):
         # See: https://coinbase.com/docs/api/permissions
         return ['user']
@@ -30,6 +33,11 @@ class CoinbaseProvider(OAuth2Provider):
     def extract_common_fields(self, data):
         # See: https://coinbase.com/api/doc/1.0/users/index.html
         return dict(name=data['name'], email=data['email'])
+
+    def complete_login(self, request, app, token, **kwargs):
+        response = requests.get(self.get_profile_url(request), params={'access_token': token})
+        extra_data = response.json()['users'][0]['user']
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [CoinbaseProvider]

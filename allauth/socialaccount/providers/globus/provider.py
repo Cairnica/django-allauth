@@ -3,7 +3,6 @@ import requests
 from allauth.socialaccount import app_settings
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class GlobusAccount(ProviderAccount):
@@ -23,6 +22,10 @@ class GlobusProvider(OAuth2Provider):
     id = 'globus'
     name = 'Globus'
     account_class = GlobusAccount
+    
+    access_token_url = '{provider_base_url}/token'
+    authorize_url = '{provider_base_url}/authorize'
+    profile_url = '{provider_base_url}/userinfo'
 
     def extract_uid(self, data):
         return str(data.get('create_time'))
@@ -39,6 +42,18 @@ class GlobusProvider(OAuth2Provider):
         if app_settings.QUERY_EMAIL:
             scope.append('email')
         return scope
+
+    def complete_login(self, request, app, token, response):
+        extra_data = requests.get(self.get_profile_url(request), params={
+            'access_token': token.token
+        }, headers={
+            'Authorization': 'Bearer ' + token.token,
+        })
+
+        return self.sociallogin_from_response(
+            request,
+            extra_data.json()
+        )
 
 
 provider_classes = [GlobusProvider]

@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class FoursquareAccount(ProviderAccount):
@@ -22,6 +21,12 @@ class FoursquareProvider(OAuth2Provider):
     id = 'foursquare'
     name = 'Foursquare'
     account_class = FoursquareAccount
+    
+    access_token_url = 'https://foursquare.com/oauth2/access_token'
+    # Issue ?? -- this one authenticates over and over again...
+    # authorize_url = 'https://foursquare.com/oauth2/authorize'
+    authorize_url = 'https://foursquare.com/oauth2/authenticate'
+    profile_url = 'https://api.foursquare.com/v2/users/self'
 
     def extract_uid(self, data):
         return str(data['id'])
@@ -30,6 +35,14 @@ class FoursquareProvider(OAuth2Provider):
         return dict(first_name=data.get('firstname'),
                     last_name=data.get('lastname'),
                     email=data.get('contact').get('email'))
+
+    def complete_login(self, request, app, token, **kwargs):
+        # Foursquare needs a version number for their API requests as
+        # documented here
+        # https://developer.foursquare.com/overview/versioning
+        resp = requests.get(self.get_profile_url(request), params={'oauth_token': token.token, 'v': '20140116'})
+        extra_data = resp.json()['response']['user']
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [FoursquareProvider]

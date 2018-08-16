@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class AngelListAccount(ProviderAccount):
@@ -22,13 +21,24 @@ class AngelListProvider(OAuth2Provider):
     name = 'AngelList'
     account_class = AngelListAccount
 
+    access_token_url = 'https://angel.co/api/oauth/token/'
+    authorize_url = 'https://angel.co/api/oauth/authorize/'
+    profile_url = 'https://api.angel.co/1/me/'
+    supports_state = False
+
     def extract_uid(self, data):
         return str(data['id'])
 
     def extract_common_fields(self, data):
-        return dict(email=data.get('email'),
-                    username=data.get('angellist_url').split('/')[-1],
-                    name=data.get('name'))
+        return {
+            'email': data.get('email'),
+            'username': data.get('angellist_url').split('/')[-1],
+            'name': data.get('name')
+        }
 
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.get_profile_url(request), params={'access_token': token.token})
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
 provider_classes = [AngelListProvider]

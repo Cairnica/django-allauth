@@ -5,7 +5,8 @@ from django.urls import reverse
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
+
+from .views import UntappdOAuth2CallbackView
 
 
 class UntappdAccount(ProviderAccount):
@@ -24,6 +25,20 @@ class UntappdProvider(OAuth2Provider):
     id = 'untappd'
     name = 'Untappd'
     account_class = UntappdAccount
+
+    callback_view_class = UntappdOAuth2CallbackView
+
+    access_token_url = 'https://untappd.com/oauth/authorize/'
+    access_token_method = 'GET'
+    authorize_url = 'https://untappd.com/oauth/authenticate/'
+    user_info_url = 'https://api.untappd.com/v4/user/info/'
+    supports_state = False
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.user_info_url, params={'access_token': token.token})
+        extra_data = resp.json()
+        # TODO: get and store the email from the user info json
+        return self.sociallogin_from_response(request, extra_data)
 
     def get_auth_params(self, request, action):
         params = super(UntappdProvider, self).get_auth_params(request, action)

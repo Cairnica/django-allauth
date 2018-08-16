@@ -4,7 +4,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class YahooAccount(ProviderAccount):
@@ -23,6 +22,17 @@ class YahooProvider(OAuth2Provider):
     id = str('yahoo')
     name = 'Yahoo'
     account_class = YahooAccount
+    
+    access_token_url = 'https://api.login.yahoo.com/oauth2/get_token'
+    authorize_url = 'https://api.login.yahoo.com/oauth2/request_auth'
+    profile_url = 'https://social.yahooapis.com/v1/user/me/profile?format=json'
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'Bearer {0}'.format(token.token)}
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def get_default_scope(self):
         """

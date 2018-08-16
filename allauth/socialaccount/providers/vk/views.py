@@ -48,14 +48,14 @@ class VKOAuth2Adapter(OAuth2Adapter):
         }
         if uid:
             params['user_ids'] = uid
-        resp = requests.get(self.profile_url,
+        resp = requests.get(self.get_profile_url(request),
                             params=params)
         resp.raise_for_status()
         extra_data = resp.json()['response'][0]
         email = kwargs['response'].get('email')
         if email:
             extra_data['email'] = email
-        return self.get_provider().sociallogin_from_response(request,
+        return self.sociallogin_from_response(request,
                                                              extra_data)
 
 

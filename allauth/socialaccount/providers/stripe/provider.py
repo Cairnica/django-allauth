@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class StripeAccount(ProviderAccount):
@@ -15,6 +14,16 @@ class StripeProvider(OAuth2Provider):
     id = 'stripe'
     name = 'Stripe'
     account_class = StripeAccount
+    
+    access_token_url = 'https://connect.stripe.com/oauth/token'
+    authorize_url = 'https://connect.stripe.com/oauth/authorize'
+    profile_url = 'https://api.stripe.com/v1/accounts/%s'
+
+    def complete_login(self, request, app, token, response, **kwargs):
+        headers = {'Authorization': 'Bearer {0}'.format(token.token)}
+        resp = requests.get(self.get_profile_url(request) % response.get('stripe_user_id'), headers=headers)
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):
         return data['id']

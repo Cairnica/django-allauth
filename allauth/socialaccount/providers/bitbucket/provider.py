@@ -1,5 +1,26 @@
+import json
+
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth.provider import OAuthProvider
+from allauth.socialaccount.providers.oauth.client import OAuth
+
+
+class BitbucketAPI(OAuth):
+
+    emails_url = 'https://bitbucket.org/api/1.0/emails/'
+    users_url = 'https://bitbucket.org/api/1.0/users/'
+
+    def get_user_info(self):
+        # TODO: Actually turn these into EmailAddress
+        emails = json.loads(self.query(self.emails_url))
+        for address in reversed(emails):
+            if address['active']:
+                email = address['email']
+                if address['primary']:
+                    break
+        data = json.loads(self.query(self.users_url + email))
+        user = data['user']
+        return user
 
 
 class BitbucketAccount(ProviderAccount):
@@ -21,6 +42,10 @@ class BitbucketProvider(OAuthProvider):
     name = 'Bitbucket'
     account_class = BitbucketAccount
 
+    request_token_url = 'https://bitbucket.org/api/1.0/oauth/request_token'
+    access_token_url = 'https://bitbucket.org/api/1.0/oauth/access_token'
+    authorize_url = 'https://bitbucket.org/api/1.0/oauth/authenticate'
+
     def extract_uid(self, data):
         return data['username']
 
@@ -29,6 +54,11 @@ class BitbucketProvider(OAuthProvider):
                     first_name=data.get('first_name'),
                     username=data.get('username'),
                     last_name=data.get('last_name'))
+
+    def complete_login(self, request, app, token, response):
+        client = BitbucketAPI(request, app.client_id, app.secret, self.request_token_url)
+        extra_data = client.get_user_info()
+        return self.sociallogin_from_response(request, extra_data)
 
 
 provider_classes = [BitbucketProvider]

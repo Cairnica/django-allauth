@@ -3,7 +3,6 @@ import requests
 from allauth.socialaccount import app_settings
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class SpotifyAccount(ProviderAccount):
@@ -25,6 +24,20 @@ class SpotifyOAuth2Provider(OAuth2Provider):
     id = 'spotify'
     name = 'Spotify'
     account_class = SpotifyAccount
+    
+    access_token_url = 'https://accounts.spotify.com/api/token'
+    authorize_url = 'https://accounts.spotify.com/authorize'
+    profile_url = 'https://api.spotify.com/v1/me'
+
+    def complete_login(self, request, app, token, **kwargs):
+        extra_data = requests.get(self.get_profile_url(request), params={
+            'access_token': token.token
+        })
+
+        return self.sociallogin_from_response(
+            request,
+            extra_data.json()
+        )
 
     def extract_uid(self, data):
         return data['id']

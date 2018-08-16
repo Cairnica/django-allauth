@@ -29,7 +29,7 @@ class VimeoOAuthAdapter(OAuthAdapter):
         client = VimeoAPI(request, app.client_id, app.secret,
                           self.request_token_url)
         extra_data = client.get_user_info()
-        return self.get_provider().sociallogin_from_response(request,
+        return self.sociallogin_from_response(request,
                                                              extra_data)
 
 

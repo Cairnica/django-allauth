@@ -1,10 +1,14 @@
+import re
 import requests
 
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseBadRequest
 
+from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
+
+from .views import ShopifyOAuth2LoginView
 
 
 class ShopifyAccount(ProviderAccount):
@@ -15,6 +19,36 @@ class ShopifyProvider(OAuth2Provider):
     id = 'shopify'
     name = 'Shopify'
     account_class = ShopifyAccount
+    
+    supports_state = False
+    scope_delimiter = ','
+
+    login_view_class = ShopifyOAuth2LoginView
+
+    @property
+    def shop_domain(self):
+        shop = self.request.GET.get('shop', '')
+        if '.' not in shop:
+            shop = '{}.myshopify.com'.format(shop)
+        # Ensure the provided hostname parameter is a valid hostname,
+        # ends with myshopify.com, and does not contain characters
+        # other than letters (a-z), numbers (0-9), dots, and hyphens.
+        if not re.match(r'^[a-z0-9-]+\.myshopify\.com$', shop):
+            raise ImmediateHttpResponse(HttpResponseBadRequest('Invalid `shop` parameter'))
+        return shop
+
+    access_token_url = 'https://{shop_domain}/admin/oauth/access_token'
+    authorize_url = 'https://{shop_domain}/admin/oauth/authorize'
+    profile_url = 'https://{shop_domain}/admin/shop.json'
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'X-Shopify-Access-Token': '{token}'.format(token=token.token)}
+        response = requests.get(self.get_profile_url(request), headers=headers)
+        extra_data = response.json()
+        associated_user = kwargs['response'].get('associated_user')
+        if associated_user:
+            extra_data['associated_user'] = associated_user
+        return self.sociallogin_from_response(request, extra_data)
 
     @property
     def is_per_user(self):

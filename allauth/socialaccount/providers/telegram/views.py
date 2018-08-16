@@ -21,16 +21,14 @@ def telegram_login(request):
     ]))
     token = provider.get_settings()['TOKEN']
     token_sha256 = hashlib.sha256(token.encode()).digest()
-    expected_hash = hmac.new(
-        token_sha256,
-        payload.encode(),
-        hashlib.sha256).hexdigest()
+    expected_hash = hmac.new(token_sha256, payload.encode(), hashlib.sha256).hexdigest()
     auth_date = int(data.pop('auth_date'))
     if hash != expected_hash or time.time() - auth_date > 30:
         return render_authentication_error(
             request,
             provider_id=provider.id,
-            extra_context={'response': data})
+            extra_context={'response': data
+        })
 
     login = provider.sociallogin_from_response(request, data)
     return complete_social_login(request, login)

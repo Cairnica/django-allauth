@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class DoximityAccount(ProviderAccount):
@@ -21,6 +20,10 @@ class DoximityProvider(OAuth2Provider):
     id = 'doximity'
     name = 'Doximity'
     account_class = DoximityAccount
+    
+    access_token_url = 'https://auth.doximity.com/oauth/token'
+    authorize_url = 'https://auth.doximity.com/oauth/authorize'
+    profile_url = 'https://www.doximity.com/api/v1/users/current'
 
     def extract_uid(self, data):
         return data[str('id')]  # the Doximity id is long
@@ -36,6 +39,13 @@ class DoximityProvider(OAuth2Provider):
 
     def get_default_scope(self):
         return ['basic', 'email']
+
+    def complete_login(self, request, app, token, **kwargs):
+        headers = {'Authorization': 'Bearer %s' % token.token}
+        resp = requests.get(self.get_profile_url(request), headers=headers)
+        extra_data = resp.json()
+        return self.sociallogin_from_response(
+            request, extra_data)
 
 
 provider_classes = [DoximityProvider]

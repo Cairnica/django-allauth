@@ -2,7 +2,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class MeetupAccount(ProviderAccount):
@@ -13,6 +12,15 @@ class MeetupProvider(OAuth2Provider):
     id = 'meetup'
     name = 'Meetup'
     account_class = MeetupAccount
+    
+    access_token_url = 'https://secure.meetup.com/oauth2/access'
+    authorize_url = 'https://secure.meetup.com/oauth2/authorize'
+    profile_url = 'https://api.meetup.com/2/member/self'
+
+    def complete_login(self, request, app, token, **kwargs):
+        resp = requests.get(self.get_profile_url(request), params={'access_token': token.token})
+        extra_data = resp.json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):
         return str(data['id'])

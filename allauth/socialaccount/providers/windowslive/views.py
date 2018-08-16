@@ -12,7 +12,7 @@ from .provider import WindowsLiveProvider
 
 
 class WindowsLiveOAuth2Adapter(OAuth2Adapter):
-    provider_id = WindowsLiveProvider.id
+    
     access_token_url = 'https://login.live.com/oauth20_token.srf'
     authorize_url = 'https://login.live.com/oauth20_authorize.srf'
     profile_url = 'https://apis.live.net/v5.0/me'

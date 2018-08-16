@@ -51,7 +51,7 @@ class LinkedInAPI(OAuth):
 
 
 class LinkedInOAuthAdapter(OAuthAdapter):
-    provider_id = LinkedInProvider.id
+    
     request_token_url = 'https://api.linkedin.com/uas/oauth/requestToken'
     access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
     authorize_url = 'https://www.linkedin.com/uas/oauth/authenticate'

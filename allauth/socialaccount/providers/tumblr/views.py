@@ -19,7 +19,7 @@ class TumblrAPI(OAuth):
 
 
 class TumblrOAuthAdapter(OAuthAdapter):
-    provider_id = TumblrProvider.id
+    
     request_token_url = 'https://www.tumblr.com/oauth/request_token'
     access_token_url = 'https://www.tumblr.com/oauth/access_token'
     authorize_url = 'https://www.tumblr.com/oauth/authorize'

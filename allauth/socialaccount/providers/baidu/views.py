@@ -10,7 +10,7 @@ from .provider import BaiduProvider
 
 
 class BaiduOAuth2Adapter(OAuth2Adapter):
-    provider_id = BaiduProvider.id
+    
     access_token_url = 'https://openapi.baidu.com/oauth/2.0/token'
     authorize_url = 'https://openapi.baidu.com/oauth/2.0/authorize'
     profile_url = 'https://openapi.baidu.com/rest/2.0/passport/users/getLoggedInUser'  # noqa

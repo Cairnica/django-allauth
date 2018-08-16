@@ -10,7 +10,7 @@ from .provider import DigitalOceanProvider
 
 
 class DigitalOceanOAuth2Adapter(OAuth2Adapter):
-    provider_id = DigitalOceanProvider.id
+    
     access_token_url = 'https://cloud.digitalocean.com/v1/oauth/token'
     authorize_url = 'https://cloud.digitalocean.com/v1/oauth/authorize'
     profile_url = 'https://api.digitalocean.com/v2/account'

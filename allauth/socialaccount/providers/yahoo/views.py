@@ -12,7 +12,7 @@ from .provider import YahooProvider
 
 
 class YahooOAuth2Adapter(OAuth2Adapter):
-    provider_id = YahooProvider.id
+    
     access_token_url = 'https://api.login.yahoo.com/oauth2/get_token'
     authorize_url = 'https://api.login.yahoo.com/oauth2/request_auth'
     profile_url = 'https://social.yahooapis.com/v1/user/me/profile?format=json'

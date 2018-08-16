@@ -10,7 +10,7 @@ from allauth.socialaccount.providers.oauth2.views import (
 
 
 class GitHubOAuth2Adapter(OAuth2Adapter):
-    provider_id = GitHubProvider.id
+    
     settings = app_settings.PROVIDERS.get(provider_id, {})
 
     if 'GITHUB_URL' in settings:

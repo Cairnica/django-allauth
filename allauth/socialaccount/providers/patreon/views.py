@@ -15,7 +15,7 @@ from .provider import PatreonProvider
 
 
 class PatreonOAuth2Adapter(OAuth2Adapter):
-    provider_id = PatreonProvider.id
+    
     access_token_url = 'https://api.patreon.com/oauth2/token'
     authorize_url = 'https://www.patreon.com/oauth2/authorize'
     profile_url = 'https://api.patreon.com/oauth2/api/current_user'

@@ -32,7 +32,7 @@ class FlickrAPI(OAuth):
 
 
 class FlickrOAuthAdapter(OAuthAdapter):
-    provider_id = FlickrProvider.id
+    
     request_token_url = 'http://www.flickr.com/services/oauth/request_token'
     access_token_url = 'http://www.flickr.com/services/oauth/access_token'
     authorize_url = 'http://www.flickr.com/services/oauth/authorize'

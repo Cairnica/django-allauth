@@ -10,7 +10,7 @@ from .provider import DropboxOAuth2Provider
 
 
 class DropboxOAuth2Adapter(OAuth2Adapter):
-    provider_id = DropboxOAuth2Provider.id
+    
     access_token_url = 'https://api.dropbox.com/oauth2/token'
     authorize_url = 'https://www.dropbox.com/oauth2/authorize'
     profile_url = 'https://api.dropbox.com/2/users/get_current_account'

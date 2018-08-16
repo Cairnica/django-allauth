@@ -39,7 +39,6 @@ class Provider(object):
     def get_slug(cls):
         return cls.slug or cls.id
 
-    @classmethod
     def get_urlpatterns(cls):
         try:
             prov_mod = import_module(cls.get_package() + '.urls')

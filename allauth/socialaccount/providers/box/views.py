@@ -10,7 +10,7 @@ from .provider import BoxOAuth2Provider
 
 
 class BoxOAuth2Adapter(OAuth2Adapter):
-    provider_id = BoxOAuth2Provider.id
+    
     access_token_url = 'https://api.box.com/oauth2/token'
     authorize_url = 'https://account.box.com/api/oauth2/authorize'
     profile_url = 'https://api.box.com/2.0/users/me'

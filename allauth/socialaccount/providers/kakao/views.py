@@ -10,7 +10,7 @@ from .provider import KakaoProvider
 
 
 class KakaoOAuth2Adapter(OAuth2Adapter):
-    provider_id = KakaoProvider.id
+    
     access_token_url = 'https://kauth.kakao.com/oauth/token'
     authorize_url = 'https://kauth.kakao.com/oauth/authorize'
     profile_url = 'https://kapi.kakao.com/v1/user/me'

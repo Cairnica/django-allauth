@@ -9,7 +9,7 @@ from allauth.socialaccount.providers.oauth2.views import (
 
 
 class GlobusAdapter(OAuth2Adapter):
-    provider_id = GlobusProvider.id
+    
     provider_default_url = 'https://auth.globus.org/v2/oauth2'
 
     provider_base_url = 'https://auth.globus.org/v2/oauth2'

@@ -20,7 +20,7 @@ class AzureOAuth2Adapter(OAuth2Adapter):
     Docs available at:
     https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols
     """
-    provider_id = AzureProvider.id
+    
     access_token_url = LOGIN_URL + '/token'
     authorize_url = LOGIN_URL + '/authorize'
     profile_url = 'https://graph.microsoft.com/v1.0/me'

@@ -11,7 +11,7 @@ from allauth.socialaccount.providers.oauth2.views import (
 
 
 class GitLabOAuth2Adapter(OAuth2Adapter):
-    provider_id = GitLabProvider.id
+    
     provider_default_url = 'https://gitlab.com'
     provider_api_version = 'v4'
 

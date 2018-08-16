@@ -10,7 +10,7 @@ from .provider import DoximityProvider
 
 
 class DoximityOAuth2Adapter(OAuth2Adapter):
-    provider_id = DoximityProvider.id
+    
     access_token_url = 'https://auth.doximity.com/oauth/token'
     authorize_url = 'https://auth.doximity.com/oauth/authorize'
     profile_url = 'https://www.doximity.com/api/v1/users/current'

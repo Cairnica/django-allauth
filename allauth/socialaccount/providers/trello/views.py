@@ -12,7 +12,7 @@ from .provider import TrelloProvider
 
 
 class TrelloOAuthAdapter(OAuthAdapter):
-    provider_id = TrelloProvider.id
+    
     request_token_url = 'https://trello.com/1/OAuthGetRequestToken'
     authorize_url = 'https://trello.com/1/OAuthAuthorizeToken'
     access_token_url = 'https://trello.com/1/OAuthGetAccessToken'

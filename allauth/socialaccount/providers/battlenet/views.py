@@ -76,7 +76,7 @@ class BattleNetOAuth2Adapter(OAuth2Adapter):
     `region` GET parameter when performing a login.
     Can be any of eu, us, kr, sea, tw or cn
     """
-    provider_id = BattleNetProvider.id
+    
     valid_regions = (
         Region.APAC,
         Region.CN,

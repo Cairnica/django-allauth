@@ -15,7 +15,7 @@ from .provider import WeixinProvider
 
 
 class WeixinOAuth2Adapter(OAuth2Adapter):
-    provider_id = WeixinProvider.id
+    
     access_token_url = 'https://api.weixin.qq.com/sns/oauth2/access_token'
     profile_url = 'https://api.weixin.qq.com/sns/userinfo'
 

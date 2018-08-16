@@ -35,11 +35,16 @@ class OAuth2Adapter(object):
     basic_auth = False
     headers = None
 
-    def __init__(self, request):
+    def __init__(self, request, provider):
         self.request = request
+        self.provider = provider
 
     def get_provider(self):
-        return providers.registry.by_id(self.provider_id, self.request)
+        return self.provider
+
+    @property
+    def provider_id(self):
+        return self.provider.id
 
     def complete_login(self, request, app, access_token, **kwargs):
         """
@@ -64,11 +69,12 @@ class OAuth2Adapter(object):
 
 class OAuth2View(object):
     @classmethod
-    def adapter_view(cls, adapter):
+    def adapter_view(cls, provider):
         def view(request, *args, **kwargs):
             self = cls()
             self.request = request
-            self.adapter = adapter(request)
+            self.provider = provider
+            self.adapter = self.provider.create_adapter(request)
             try:
                 return self.dispatch(request, *args, **kwargs)
             except ImmediateHttpResponse as e:

@@ -10,7 +10,7 @@ from .provider import BitlyProvider
 
 
 class BitlyOAuth2Adapter(OAuth2Adapter):
-    provider_id = BitlyProvider.id
+    
     access_token_url = 'https://api-ssl.bitly.com/oauth/access_token'
     authorize_url = 'https://bitly.com/oauth/authorize'
     profile_url = 'https://api-ssl.bitly.com/v3/user/info'

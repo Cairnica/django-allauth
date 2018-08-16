@@ -14,7 +14,7 @@ from .provider import (
 
 
 class FirefoxAccountsOAuth2Adapter(OAuth2Adapter):
-    provider_id = FirefoxAccountsProvider.id
+    
     access_token_url = FXA_OAUTH_ENDPOINT + '/token'
     authorize_url = FXA_OAUTH_ENDPOINT + '/authorization'
     profile_url = FXA_PROFILE_ENDPOINT + '/profile'

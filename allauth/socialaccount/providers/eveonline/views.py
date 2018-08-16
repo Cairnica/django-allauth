@@ -10,7 +10,7 @@ from .provider import EveOnlineProvider
 
 
 class EveOnlineOAuth2Adapter(OAuth2Adapter):
-    provider_id = EveOnlineProvider.id
+    
     access_token_url = 'https://login.eveonline.com/oauth/token'
     authorize_url = 'https://login.eveonline.com/oauth/authorize'
     profile_url = 'https://login.eveonline.com/oauth/verify'

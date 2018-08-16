@@ -24,7 +24,7 @@ class FiveHundredPxAPI(OAuth):
 
 
 class FiveHundredPxOAuthAdapter(OAuthAdapter):
-    provider_id = FiveHundredPxProvider.id
+    
     request_token_url = API_BASE + '/oauth/request_token'
     access_token_url = API_BASE + '/oauth/access_token'
     authorize_url = API_BASE + '/oauth/authorize'

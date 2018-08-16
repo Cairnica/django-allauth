@@ -10,7 +10,7 @@ from .provider import TwentyThreeAndMeProvider
 
 
 class TwentyTreeAndMeOAuth2Adapter(OAuth2Adapter):
-    provider_id = TwentyThreeAndMeProvider.id
+    
     access_token_url = 'https://api.23andme.com/token'
     authorize_url = 'https://api.23andme.com/authorize'
     profile_url = 'https://api.23andme.com/1/user/'

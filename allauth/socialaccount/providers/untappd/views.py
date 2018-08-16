@@ -11,7 +11,7 @@ from .provider import UntappdProvider
 
 
 class UntappdOAuth2Adapter(OAuth2Adapter):
-    provider_id = UntappdProvider.id
+    
     access_token_url = 'https://untappd.com/oauth/authorize/'
     access_token_method = 'GET'
     authorize_url = 'https://untappd.com/oauth/authenticate/'

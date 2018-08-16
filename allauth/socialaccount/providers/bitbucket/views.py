@@ -29,7 +29,7 @@ class BitbucketAPI(OAuth):
 
 
 class BitbucketOAuthAdapter(OAuthAdapter):
-    provider_id = BitbucketProvider.id
+    
     request_token_url = 'https://bitbucket.org/api/1.0/oauth/request_token'
     access_token_url = 'https://bitbucket.org/api/1.0/oauth/access_token'
     authorize_url = 'https://bitbucket.org/api/1.0/oauth/authenticate'

@@ -33,7 +33,7 @@ USER_FIELDS = ['uid',
 
 
 class OdnoklassnikiOAuth2Adapter(OAuth2Adapter):
-    provider_id = OdnoklassnikiProvider.id
+    
     access_token_url = 'http://api.odnoklassniki.ru/oauth/token.do'
     authorize_url = 'http://www.odnoklassniki.ru/oauth/authorize'
     profile_url = 'http://api.odnoklassniki.ru/fb.do'

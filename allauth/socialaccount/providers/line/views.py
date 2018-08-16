@@ -10,7 +10,7 @@ from .provider import LineProvider
 
 
 class LineOAuth2Adapter(OAuth2Adapter):
-    provider_id = LineProvider.id
+    
     access_token_url = 'https://api.line.me/v1/oauth/accessToken'
     authorize_url = 'https://access.line.me/dialog/oauth/weblogin'
     profile_url = 'https://api.line.me/v1/profile'

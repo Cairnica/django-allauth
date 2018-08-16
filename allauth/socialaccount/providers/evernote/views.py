@@ -13,7 +13,7 @@ from .provider import EvernoteProvider
 
 
 class EvernoteOAuthAdapter(OAuthAdapter):
-    provider_id = EvernoteProvider.id
+    
     settings = app_settings.PROVIDERS.get(provider_id, {})
     request_token_url = 'https://%s/oauth' % (settings.get(
         'EVERNOTE_HOSTNAME',

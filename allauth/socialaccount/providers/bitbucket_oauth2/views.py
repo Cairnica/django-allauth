@@ -11,7 +11,7 @@ from .provider import BitbucketOAuth2Provider
 
 
 class BitbucketOAuth2Adapter(OAuth2Adapter):
-    provider_id = BitbucketOAuth2Provider.id
+    
     access_token_url = 'https://bitbucket.org/site/oauth2/access_token'
     authorize_url = 'https://bitbucket.org/site/oauth2/authorize'
     profile_url = 'https://api.bitbucket.org/2.0/user'

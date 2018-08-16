@@ -10,7 +10,7 @@ from .provider import SoundCloudProvider
 
 
 class SoundCloudOAuth2Adapter(OAuth2Adapter):
-    provider_id = SoundCloudProvider.id
+    
     access_token_url = 'https://api.soundcloud.com/oauth2/token'
     authorize_url = 'https://soundcloud.com/connect'
     profile_url = 'https://api.soundcloud.com/me.json'

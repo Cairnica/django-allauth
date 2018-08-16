@@ -10,7 +10,6 @@ from .provider import AmazonProvider
 
 
 class AmazonOAuth2Adapter(OAuth2Adapter):
-    provider_id = AmazonProvider.id
     access_token_url = 'https://api.amazon.com/auth/o2/token'
     authorize_url = 'http://www.amazon.com/ap/oa'
     profile_url = 'https://www.amazon.com/ap/user/profile'

@@ -1,7 +1,10 @@
 """Customise Provider classes for Eventbrite API v3."""
+import requests
+
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
+from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class EventbriteAccount(ProviderAccount):

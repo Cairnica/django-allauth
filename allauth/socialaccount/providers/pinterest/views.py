@@ -11,7 +11,7 @@ from .provider import PinterestProvider
 
 
 class PinterestOAuth2Adapter(OAuth2Adapter):
-    provider_id = PinterestProvider.id
+    
 
     provider_default_url = 'api.pinterest.com'
     provider_default_api_version = 'v1'

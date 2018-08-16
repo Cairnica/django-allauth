@@ -1,8 +1,11 @@
 """
 Provider for Patreon
 """
+import requests
+
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
+from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class PatreonAccount(ProviderAccount):

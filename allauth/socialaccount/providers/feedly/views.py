@@ -13,7 +13,7 @@ from .provider import FeedlyProvider
 
 
 class FeedlyOAuth2Adapter(OAuth2Adapter):
-    provider_id = FeedlyProvider.id
+    
     host = app_settings.PROVIDERS.get(provider_id, {}).get(
         'HOST', 'cloud.feedly.com')
     access_token_url = 'https://%s/v3/auth/token' % host

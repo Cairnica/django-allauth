@@ -14,7 +14,7 @@ class EventbriteOAuth2Adapter(OAuth2Adapter):
 
     """OAuth2Adapter for Eventbrite API v3."""
 
-    provider_id = EventbriteProvider.id
+    
 
     authorize_url = 'https://www.eventbrite.com/oauth/authorize'
     access_token_url = 'https://www.eventbrite.com/oauth/token'

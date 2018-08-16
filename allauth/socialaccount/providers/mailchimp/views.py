@@ -14,7 +14,7 @@ class MailChimpOAuth2Adapter(OAuth2Adapter):
 
     """OAuth2Adapter for MailChimp API v3."""
 
-    provider_id = MailChimpProvider.id
+    
 
     authorize_url = 'https://login.mailchimp.com/oauth2/authorize'
     access_token_url = 'https://login.mailchimp.com/oauth2/token'

@@ -11,7 +11,7 @@ from allauth.socialaccount.providers.oauth2.views import (
 
 
 class Auth0OAuth2Adapter(OAuth2Adapter):
-    provider_id = Auth0Provider.id
+    
     supports_state = True
 
     settings = app_settings.PROVIDERS.get(provider_id, {})

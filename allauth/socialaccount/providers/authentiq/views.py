@@ -12,7 +12,7 @@ from .provider import AuthentiqProvider
 
 
 class AuthentiqOAuth2Adapter(OAuth2Adapter):
-    provider_id = AuthentiqProvider.id
+    
 
     settings = app_settings.PROVIDERS.get(provider_id, {})
 

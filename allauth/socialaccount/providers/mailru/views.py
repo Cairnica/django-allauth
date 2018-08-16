@@ -11,7 +11,7 @@ from .provider import MailRuProvider
 
 
 class MailRuOAuth2Adapter(OAuth2Adapter):
-    provider_id = MailRuProvider.id
+    
     access_token_url = 'https://connect.mail.ru/oauth/token'
     authorize_url = 'https://connect.mail.ru/oauth/authorize'
     profile_url = 'http://www.appsmail.ru/platform/api'

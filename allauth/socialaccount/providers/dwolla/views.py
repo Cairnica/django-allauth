@@ -34,7 +34,7 @@ class DwollaOAuth2Adapter(OAuth2Adapter):
 
     scope_delimiter = '|'
 
-    provider_id = DwollaProvider.id
+    
     access_token_url = TOKEN_URL
     authorize_url = AUTH_URL
 

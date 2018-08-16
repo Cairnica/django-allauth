@@ -34,7 +34,7 @@ USER_FIELDS = ['first_name',
 
 
 class VKOAuth2Adapter(OAuth2Adapter):
-    provider_id = VKProvider.id
+    
     access_token_url = 'https://oauth.vk.com/access_token'
     authorize_url = 'https://oauth.vk.com/authorize'
     profile_url = 'https://api.vk.com/method/users.get'

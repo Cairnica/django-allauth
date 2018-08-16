@@ -10,7 +10,7 @@ from .provider import HubicProvider
 
 
 class HubicOAuth2Adapter(OAuth2Adapter):
-    provider_id = HubicProvider.id
+    
     access_token_url = 'https://api.hubic.com/oauth/token'
     authorize_url = 'https://api.hubic.com/oauth/auth'
     profile_url = 'https://api.hubic.com/1.0/account'

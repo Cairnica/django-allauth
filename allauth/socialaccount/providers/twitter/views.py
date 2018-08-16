@@ -24,7 +24,7 @@ class TwitterAPI(OAuth):
 
 
 class TwitterOAuthAdapter(OAuthAdapter):
-    provider_id = TwitterProvider.id
+    
     request_token_url = 'https://api.twitter.com/oauth/request_token'
     access_token_url = 'https://api.twitter.com/oauth/access_token'
     # Issue #42 -- this one authenticates over and over again...

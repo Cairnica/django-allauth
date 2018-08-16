@@ -11,7 +11,7 @@ from .provider import DataportenProvider
 
 
 class DataportenAdapter(OAuth2Adapter):
-    provider_id = DataportenProvider.id
+    
     access_token_url = 'https://auth.dataporten.no/oauth/token'
     authorize_url = 'https://auth.dataporten.no/oauth/authorization'
     profile_url = 'https://auth.dataporten.no/userinfo'

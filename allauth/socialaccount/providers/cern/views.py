@@ -10,7 +10,7 @@ from .provider import CernProvider
 
 
 class CernOAuth2Adapter(OAuth2Adapter):
-    provider_id = CernProvider.id
+    
     access_token_url = 'https://oauth.web.cern.ch/OAuth/Token'
     authorize_url = 'https://oauth.web.cern.ch/OAuth/Authorize'
     profile_url = 'https://oauthresource.web.cern.ch/api/User'

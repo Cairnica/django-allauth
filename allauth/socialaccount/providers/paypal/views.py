@@ -10,7 +10,7 @@ from .provider import PaypalProvider
 
 
 class PaypalOAuth2Adapter(OAuth2Adapter):
-    provider_id = PaypalProvider.id
+    
     supports_state = False
 
     @property

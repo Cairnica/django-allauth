@@ -1,11 +1,14 @@
+
+import requests
+
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
+from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 
 
 class AmazonAccount(ProviderAccount):
     def to_str(self):
-        return self.account.extra_data.get('name',
-                                           super(AmazonAccount, self).to_str())
+        return self.account.extra_data.get('name', super(AmazonAccount, self).to_str())
 
 
 class AmazonProvider(OAuth2Provider):

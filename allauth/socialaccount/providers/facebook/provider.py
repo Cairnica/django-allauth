@@ -18,6 +18,7 @@ from allauth.socialaccount.providers.base import (
     ProviderAccount,
 )
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
+from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 from allauth.utils import import_callable
 
 from .locale import get_default_locale_callable

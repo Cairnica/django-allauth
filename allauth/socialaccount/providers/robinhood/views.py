@@ -10,7 +10,7 @@ from .provider import RobinhoodProvider
 
 
 class RobinhoodOAuth2Adapter(OAuth2Adapter):
-    provider_id = RobinhoodProvider.id
+    
 
     @property
     def authorize_url(self):

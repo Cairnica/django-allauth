@@ -53,7 +53,7 @@ def fb_complete_login(request, app, token):
 
 
 class FacebookOAuth2Adapter(OAuth2Adapter):
-    provider_id = FacebookProvider.id
+    
     provider_default_auth_url = (
         'https://www.facebook.com/{}/dialog/oauth'.format(
             GRAPH_API_VERSION))

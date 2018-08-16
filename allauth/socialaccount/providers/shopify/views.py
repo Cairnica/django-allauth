@@ -15,7 +15,7 @@ from .provider import ShopifyProvider
 
 
 class ShopifyOAuth2Adapter(OAuth2Adapter):
-    provider_id = ShopifyProvider.id
+    
     supports_state = False
     scope_delimiter = ','
 

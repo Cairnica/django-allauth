@@ -10,7 +10,6 @@ from .provider import LinkedInOAuth2Provider
 
 
 class LinkedInOAuth2Adapter(OAuth2Adapter):
-    provider_id = LinkedInOAuth2Provider.id
     access_token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
     authorize_url = 'https://www.linkedin.com/oauth/v2/authorization'
     profile_url = 'https://api.linkedin.com/v1/people/~'

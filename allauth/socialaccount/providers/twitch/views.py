@@ -11,7 +11,7 @@ from .provider import TwitchProvider
 
 
 class TwitchOAuth2Adapter(OAuth2Adapter):
-    provider_id = TwitchProvider.id
+    
     access_token_url = 'https://api.twitch.tv/kraken/oauth2/token'
     authorize_url = 'https://api.twitch.tv/kraken/oauth2/authorize'
     profile_url = 'https://api.twitch.tv/kraken/user'

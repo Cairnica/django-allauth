@@ -10,7 +10,7 @@ from .provider import SalesforceProvider
 
 
 class SalesforceOAuth2Adapter(OAuth2Adapter):
-    provider_id = SalesforceProvider.id
+    
 
     @property
     def base_url(self):

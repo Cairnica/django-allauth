@@ -11,7 +11,7 @@ from .provider import QuickBooksOAuth2Provider
 
 
 class QuickBooksOAuth2Adapter(OAuth2Adapter):
-    provider_id = QuickBooksOAuth2Provider.id
+    
     access_token_url = \
         'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer'
     authorize_url = \

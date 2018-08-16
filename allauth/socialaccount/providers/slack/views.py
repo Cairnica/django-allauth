@@ -11,7 +11,7 @@ from .provider import SlackProvider
 
 
 class SlackOAuth2Adapter(OAuth2Adapter):
-    provider_id = SlackProvider.id
+    
 
     access_token_url = 'https://slack.com/api/oauth.access'
     authorize_url = 'https://slack.com/oauth/authorize'

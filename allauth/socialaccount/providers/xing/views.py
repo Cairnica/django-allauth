@@ -19,7 +19,7 @@ class XingAPI(OAuth):
 
 
 class XingOAuthAdapter(OAuthAdapter):
-    provider_id = XingProvider.id
+    
     request_token_url = 'https://api.xing.com/v1/request_token'
     access_token_url = 'https://api.xing.com/v1/access_token'
     authorize_url = 'https://www.xing.com/v1/authorize'

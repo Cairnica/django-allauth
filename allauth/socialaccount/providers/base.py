@@ -42,6 +42,7 @@ def view_property(func):
 
 class Provider(object):
     default_settings = None
+    account_class = None
 
     def __init__(self, factory, request=None):
         self.factory = factory

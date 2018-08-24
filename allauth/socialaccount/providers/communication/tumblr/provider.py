@@ -1,6 +1,5 @@
-import json
+import requests
 
-from allauth.socialaccount.providers.core.oauth.client import OAuth
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth.provider import OAuthProvider
 
@@ -16,14 +15,6 @@ class TumblrAccount(ProviderAccount):
         return name
 
 
-class TumblrAPI(OAuth):
-    url = 'http://api.tumblr.com/v2/user/info'
-
-    def get_user_info(self):
-        data = json.loads(self.query(self.url))
-        return data['response']['user']
-
-
 class TumblrProvider(OAuthProvider):
     id = 'tumblr'
     name = 'Tumblr'
@@ -32,10 +23,11 @@ class TumblrProvider(OAuthProvider):
     request_token_url = 'https://www.tumblr.com/oauth/request_token'
     access_token_url = 'https://www.tumblr.com/oauth/access_token'
     authorize_url = 'https://www.tumblr.com/oauth/authorize'
+    profile_url = 'http://api.tumblr.com/v2/user/info'
 
-    def complete_login(self, request, app, token, response):
-        client = TumblrAPI(request, app.client_id, app.secret, self.request_token_url)
-        extra_data = client.get_user_info()
+    def complete_login(self, request, app, access_token, **kwargs):
+        resp = requests.get(self.profile_url, auth=self.get_auth_header(app, access_token))
+        extra_data = resp.json()['response']['user']
         return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):

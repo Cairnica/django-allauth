@@ -1,3 +1,5 @@
+import requests
+
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth.provider import OAuthProvider
 
@@ -22,6 +24,16 @@ class XingProvider(OAuthProvider):
     id = 'xing'
     name = 'Xing'
     account_class = XingAccount
+    
+    request_token_url = 'https://api.xing.com/v1/request_token'
+    access_token_url = 'https://api.xing.com/v1/access_token'
+    authorize_url = 'https://www.xing.com/v1/authorize'
+    profile_url = 'https://api.xing.com/v1/users/me.json'
+
+    def complete_login(self, request, app, token, response):
+        resp = requests.get(self.profile_url, self.get_auth_header(app, token))
+        extra_data = resp.json()['users'][0]
+        return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):
         return data['id']

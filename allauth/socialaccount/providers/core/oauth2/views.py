@@ -14,14 +14,12 @@ from allauth.socialaccount.helpers import (
     render_authentication_error,
 )
 from allauth.socialaccount.models import SocialLogin, SocialToken
-from allauth.socialaccount.providers.base import ProviderException, ProviderView
+from allauth.socialaccount.providers.base import ProviderException, ProviderView, AuthAction, AuthError
 from allauth.socialaccount.providers.core.oauth2.client import (
     OAuth2Client,
     OAuth2Error,
 )
 from allauth.utils import build_absolute_uri, get_request_param
-
-from ..base import AuthAction, AuthError
 
 
 class OAuth2View(ProviderView):

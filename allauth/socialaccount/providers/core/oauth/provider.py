@@ -1,3 +1,5 @@
+from requests_oauthlib import OAuth1
+
 from django.urls import reverse
 from django.conf.urls import include, url
 from django.utils.http import urlencode
@@ -13,23 +15,29 @@ class OAuthProvider(Provider):
     login_view_class = OAuthLoginView
     callback_view_class = OAuthCallbackView
 
-    @cached_property
-    def login_view(self):
-        return self.login_view_class.adapter_view(self)
+    request_token_url = None
+    access_token_url = None
+    authorize_url = None
+    profile_url = None
 
-    @cached_property
-    def callback_view(self):
-        return self.callback_view_class.adapter_view(self)
+    class Factory(Provider.Factory):
+        @cached_property
+        def login_view(self):
+            return self.login_view_class.adapter_view(self)
 
-    def get_urlpatterns(self):
-        slug = self.slug
+        @cached_property
+        def callback_view(self):
+            return self.callback_view_class.adapter_view(self)
 
-        urlpatterns = [
-            url(r'^login/$', self.login_view, name=slug + "_login"),
-            url(r'^login/callback/$', self.callback_view, name=slug + "_callback"),
-        ]
+        def get_urlpatterns(self):
+            slug = self.slug
 
-        return [url('^' + slug + '/', include(urlpatterns))]
+            urlpatterns = [
+                url(r'^login/$', self.login_view, name=slug + "_login"),
+                url(r'^login/callback/$', self.callback_view, name=slug + "_callback"),
+            ]
+
+            return [url('^' + slug + '/', include(urlpatterns))]
 
     def get_login_url(self, request, **kwargs):
         url = reverse(self.slug + "_login")
@@ -51,11 +59,19 @@ class OAuthProvider(Provider):
         # adapter/provider is a bit too thin here.
         return None
 
-    def complete_login(self, request, app):
+    def complete_login(self, request, app, access_token, **kwargs):
         """
         Returns a SocialLogin instance
         """
         raise NotImplementedError
+
+    def get_auth_header(self, social_app, access_token):
+        return OAuth1(
+            social_app.consumer_key,
+            client_secret=social_app.secret_key,
+            resource_owner_key=access_token.token,
+            resource_owner_secret=access_token.token_secret
+        )
 
     def get_scope(self, request):
         settings = self.get_settings()

@@ -49,9 +49,13 @@ class Provider(object):
         self.request = request
 
     class Factory():
-        def __init__(self, ProviderClass, id=None):
+        def __init__(self, ProviderClass, id=None, **kwargs):
             self.id = id or Provider.__name__
             self.provider_class = ProviderClass
+
+        @property
+        def settings(self):
+            return dict().update(self.provider_class.default_settings, app_settings.PROVIDERS.get(self.id, {}))
 
         @property
         def slug(self):
@@ -99,11 +103,11 @@ class Provider(object):
         return self.account_class(social_account)
 
     def get_settings(self):
-        return dict().update(self.default_settings, app_settings.PROVIDERS.get(self.id, {}))
+        return self.factory.settings
 
     @property
     def settings(self):
-        return self.get_settings()
+        return self.factory.settings
 
     def sociallogin_from_response(self, request, response):
         """

@@ -169,13 +169,13 @@ class OAuth(object):
         Get the saved access token for private resources from the session.
         """
         try:
-            return self.request.session['oauth_%s_access_token'
-                                        % get_token_prefix(
-                                            self.request_token_url)]
+            return self.request.session['oauth_%s_access_token' % get_token_prefix(self.request_token_url)]
+
         except KeyError:
             raise OAuthError(
                 _('No access token saved for "%s".')
-                % get_token_prefix(self.request_token_url))
+                % get_token_prefix(self.request_token_url)
+            )
 
     def query(self, url, method="GET", params=dict(), headers=dict()):
         """
@@ -187,14 +187,13 @@ class OAuth(object):
             self.consumer_key,
             client_secret=self.secret_key,
             resource_owner_key=access_token['oauth_token'],
-            resource_owner_secret=access_token['oauth_token_secret'])
-        response = getattr(requests, method.lower())(url,
-                                                     auth=oauth,
-                                                     headers=headers,
-                                                     params=params)
+            resource_owner_secret=access_token['oauth_token_secret']
+        )
+        response = getattr(requests, method.lower())(url, auth=oauth, headers=headers, params=params)
         if response.status_code != 200:
             raise OAuthError(
                 _('No access to private resources at "%s".')
-                % get_token_prefix(self.request_token_url))
+                % get_token_prefix(self.request_token_url)
+            )
 
         return response.text

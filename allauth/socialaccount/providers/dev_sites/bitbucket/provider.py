@@ -2,25 +2,6 @@ import json
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth.provider import OAuthProvider
-from allauth.socialaccount.providers.core.oauth.client import OAuth
-
-
-class BitbucketAPI(OAuth):
-
-    emails_url = 'https://bitbucket.org/api/1.0/emails/'
-    users_url = 'https://bitbucket.org/api/1.0/users/'
-
-    def get_user_info(self):
-        # TODO: Actually turn these into EmailAddress
-        emails = json.loads(self.query(self.emails_url))
-        for address in reversed(emails):
-            if address['active']:
-                email = address['email']
-                if address['primary']:
-                    break
-        data = json.loads(self.query(self.users_url + email))
-        user = data['user']
-        return user
 
 
 class BitbucketAccount(ProviderAccount):
@@ -46,6 +27,9 @@ class BitbucketProvider(OAuthProvider):
     access_token_url = 'https://bitbucket.org/api/1.0/oauth/access_token'
     authorize_url = 'https://bitbucket.org/api/1.0/oauth/authenticate'
 
+    emails_url = 'https://bitbucket.org/api/1.0/emails/'
+    users_url = 'https://bitbucket.org/api/1.0/users/'
+
     def extract_uid(self, data):
         return data['username']
 
@@ -56,8 +40,17 @@ class BitbucketProvider(OAuthProvider):
                     last_name=data.get('last_name'))
 
     def complete_login(self, request, app, token, response):
-        client = BitbucketAPI(request, app.client_id, app.secret, self.request_token_url)
-        extra_data = client.get_user_info()
+        auth = self.get_auth_header(app, token)
+
+        emails_resp = requests.get(self.emails_url, auth=auth)
+        for address in reversed(emails_resp.json()):
+            if address['active']:
+                email = address['email']
+                if address['primary']:
+                    break
+
+        users_resp = requests.get(self.users_url + email, auth=auth)
+        extra_data = users_resp.json()['user']
         return self.sociallogin_from_response(request, extra_data)
 
 

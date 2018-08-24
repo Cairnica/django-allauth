@@ -3,52 +3,45 @@ import importlib
 from collections import OrderedDict
 
 from django.conf import settings
+from django.utils.functional import cached_property
+
+from allauth.utils import import_attribute
+
+from .base import Provider
 
 
 class ProviderRegistry(object):
     def __init__(self):
-        self.provider_map = OrderedDict()
-        self.loaded = False
+        self._provider_map = OrderedDict()
 
-    def get_list(self, request=None):
-        self.load()
-        return [
-            provider_cls(request)
-            for provider_cls in self.provider_map.values()]
+    @cached_property
+    def provider_map(self):
+        for provider in settings.PROVIDERS:
+            try:
+                provider_class = import_attribute(provider)
+            except (ImportError, AttributeError):
+                provider_module = importlib.import_module(provider + '.provider')
+                # TODO Find the class
 
-    def register(self, cls):
-        self.provider_map[cls.id] = cls
+            self.register(provider_class)
 
-    def by_id(self, id, request=None):
-        self.load()
-        return self.provider_map[id](request=request)
+        return self._provider_map
+
+    def register(self, factory, id=None, **kwargs):
+        if not isinstance(factory, Provider.Factory):
+            factory = factory.Factory(factory, id, **kwargs)
+        elif id or kwargs:
+            raise ValueError(f'Cannot provide id or kwargs when registering an instanciated Factory')
+        self._provider_map[factory.id] = factory
+
+    def get_list(self):
+        return list(self.provider_map.values())
+
+    def by_id(self, id):
+        return self.provider_map[id]
 
     def as_choices(self):
-        self.load()
         for provider_cls in self.provider_map.values():
             yield (provider_cls.id, provider_cls.name)
-
-    def load(self):
-        # TODO: Providers register with the provider registry when
-        # loaded. Here, we build the URLs for all registered providers. So, we
-        # really need to be sure all providers did register, which is why we're
-        # forcefully importing the `provider` modules here. The overall
-        # mechanism is way to magical and depends on the import order et al, so
-        # all of this really needs to be revisited.
-        if not self.loaded:
-            for app in settings.INSTALLED_APPS:
-                try:
-                    provider_module = importlib.import_module(
-                        app + '.provider'
-                    )
-                except ImportError:
-                    pass
-                else:
-                    for cls in getattr(
-                        provider_module, 'provider_classes', []
-                    ):
-                        self.register(cls)
-            self.loaded = True
-
 
 registry = ProviderRegistry()

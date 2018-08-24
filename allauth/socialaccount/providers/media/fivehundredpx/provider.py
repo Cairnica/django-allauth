@@ -1,6 +1,5 @@
-import json
+import requests
 
-from allauth.socialaccount.providers.core.oauth.client import OAuth
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth.provider import OAuthProvider
 
@@ -22,16 +21,6 @@ class FiveHundredPxAccount(ProviderAccount):
 API_BASE = 'https://api.500px.com/v1'
 
 
-class FiveHundredPxAPI(OAuth):
-    """
-    Verifying 500px credentials
-    """
-    url = API_BASE + '/users'
-
-    def get_user_info(self):
-        return json.loads(self.query(self.url))['user']
-
-
 class FiveHundredPxProvider(OAuthProvider):
     id = '500px'
     name = '500px'
@@ -40,6 +29,7 @@ class FiveHundredPxProvider(OAuthProvider):
     request_token_url = API_BASE + '/oauth/request_token'
     access_token_url = API_BASE + '/oauth/access_token'
     authorize_url = API_BASE + '/oauth/authorize'
+    profile_url = API_BASE + '/users'
 
     def get_default_scope(self):
         return []
@@ -54,8 +44,8 @@ class FiveHundredPxProvider(OAuthProvider):
                     last_name=data.get('lastname'))
 
     def complete_login(self, request, app, token, response):
-        client = FiveHundredPxAPI(request, app.client_id, app.secret, self.request_token_url)
-        extra_data = client.get_user_info()
+        resp = requests.get(self.profile_url, auth=self.get_auth_header(app, token))
+        extra_data = resp.json()
         return self.sociallogin_from_response(request, extra_data)
 
 

@@ -2,7 +2,6 @@ import requests
 
 from django.utils.http import urlencode
 
-from allauth.socialaccount.providers.core.oauth.client import OAuth
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth.provider import OAuthProvider
 

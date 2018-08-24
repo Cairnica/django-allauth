@@ -5,7 +5,7 @@ from .provider import CoinbaseProvider
 
 
 class CoinbaseTests(OAuth2TestsMixin, TestCase):
-    provider_id = CoinbaseProvider.id
+    provider_class = CoinbaseProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

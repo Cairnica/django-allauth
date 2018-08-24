@@ -5,7 +5,7 @@ from .provider import KakaoProvider
 
 
 class KakaoTests(OAuth2TestsMixin, TestCase):
-    provider_id = KakaoProvider.id
+    provider_class = KakaoProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

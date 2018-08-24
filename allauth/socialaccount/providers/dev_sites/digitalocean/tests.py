@@ -5,7 +5,7 @@ from .provider import DigitalOceanProvider
 
 
 class DigitalOceanTests(OAuth2TestsMixin, TestCase):
-    provider_id = DigitalOceanProvider.id
+    provider_class = DigitalOceanProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

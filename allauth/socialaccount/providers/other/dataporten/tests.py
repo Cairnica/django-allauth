@@ -5,7 +5,7 @@ from .provider import DataportenProvider
 
 
 class DataportenTest(OAuth2TestsMixin, TestCase):
-    provider_id = DataportenProvider.id
+    provider_class = DataportenProvider
 
     def setUp(self):
         super(DataportenTest, self).setUp()

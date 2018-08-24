@@ -7,7 +7,7 @@ from .provider import GlobusProvider
 
 
 class GlobusTests(OAuth2TestsMixin, TestCase):
-    provider_id = GlobusProvider.id
+    provider_class = GlobusProvider
 
     @override_settings(SOCIALACCOUNT_QUERY_EMAIL=True)
     def get_mocked_response(self):

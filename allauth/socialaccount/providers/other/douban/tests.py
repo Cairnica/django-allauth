@@ -5,7 +5,7 @@ from .provider import DoubanProvider
 
 
 class DoubanTests(OAuth2TestsMixin, TestCase):
-    provider_id = DoubanProvider.id
+    provider_class = DoubanProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

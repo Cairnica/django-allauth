@@ -6,7 +6,7 @@ from .provider import VimeoProvider
 
 
 class VimeoTests(OAuthTestsMixin, TestCase):
-    provider_id = VimeoProvider.id
+    provider_class = VimeoProvider
 
     def get_mocked_response(self):
         return [MockedResponse(200, """

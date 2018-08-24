@@ -5,7 +5,7 @@ from .provider import NaverProvider
 
 
 class NaverTests(OAuth2TestsMixin, TestCase):
-    provider_id = NaverProvider.id
+    provider_class = NaverProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

@@ -5,7 +5,7 @@ from .provider import TwitchProvider
 
 
 class TwitchTests(OAuth2TestsMixin, TestCase):
-    provider_id = TwitchProvider.id
+    provider_class = TwitchProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

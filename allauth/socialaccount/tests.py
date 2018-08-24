@@ -24,7 +24,7 @@ from .views import signup
 
 
 class OAuthTestsMixin(object):
-    provider_id = None
+    provider_class = None
 
     def get_mocked_response(self):
         pass
@@ -123,13 +123,13 @@ class OAuthTestsMixin(object):
 # create_oauth_tests() rather than using the mixin directly.
 def create_oauth_tests(provider):
     class Class(OAuthTestsMixin, TestCase):
-        provider_id = provider.id
+        provider_class = provider
     Class.__name__ = 'OAuthTests_' + provider.id
     return Class
 
 
 class OAuth2TestsMixin(object):
-    provider_id = None
+    provider_class = None
 
     def get_mocked_response(self):
         pass
@@ -243,7 +243,7 @@ class OAuth2TestsMixin(object):
 # create_oauth2_tests() rather than using the mixin directly.
 def create_oauth2_tests(provider):
     class Class(OAuth2TestsMixin, TestCase):
-        provider_id = provider.id
+        provider_class = provider
     Class.__name__ = 'OAuth2Tests_' + provider.id
     return Class
 

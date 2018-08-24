@@ -5,7 +5,7 @@ from .provider import SlackProvider
 
 
 class SlackOAuth2Tests(OAuth2TestsMixin, TestCase):
-    provider_id = SlackProvider.id
+    provider_class = SlackProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """{

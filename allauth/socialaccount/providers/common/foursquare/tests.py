@@ -5,7 +5,7 @@ from .provider import FoursquareProvider
 
 
 class FoursquareTests(OAuth2TestsMixin, TestCase):
-    provider_id = FoursquareProvider.id
+    provider_class = FoursquareProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

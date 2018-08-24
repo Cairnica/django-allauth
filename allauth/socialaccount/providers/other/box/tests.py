@@ -8,7 +8,7 @@ from .provider import BoxOAuth2Provider
 
 
 class BoxOAuth2Tests(OAuth2TestsMixin, TestCase):
-    provider_id = BoxOAuth2Provider.id
+    provider_class = BoxOAuth2Provider
 
     def get_mocked_response(self):
         return [MockedResponse(200, """{

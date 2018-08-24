@@ -5,7 +5,7 @@ from .provider import SoundCloudProvider
 
 
 class SoundCloudTests(OAuth2TestsMixin, TestCase):
-    provider_id = SoundCloudProvider.id
+    provider_class = SoundCloudProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

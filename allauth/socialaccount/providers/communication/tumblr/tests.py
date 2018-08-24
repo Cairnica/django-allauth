@@ -8,7 +8,7 @@ from .provider import TumblrProvider
 
 
 class TumblrTests(OAuthTestsMixin, TestCase):
-    provider_id = TumblrProvider.id
+    provider_class = TumblrProvider
 
     def get_mocked_response(self):
         return [MockedResponse(200, """

@@ -5,7 +5,7 @@ from .provider import BasecampProvider
 
 
 class BasecampTests(OAuth2TestsMixin, TestCase):
-    provider_id = BasecampProvider.id
+    provider_class = BasecampProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

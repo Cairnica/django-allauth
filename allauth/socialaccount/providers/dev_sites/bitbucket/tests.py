@@ -6,7 +6,7 @@ from .provider import BitbucketProvider
 
 
 class BitbucketTests(OAuthTestsMixin, TestCase):
-    provider_id = BitbucketProvider.id
+    provider_class = BitbucketProvider
 
     def get_mocked_response(self):
         # FIXME: Replace with actual/complete Bitbucket response

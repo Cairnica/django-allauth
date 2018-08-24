@@ -6,7 +6,7 @@ from .provider import TwitterProvider
 
 
 class TwitterTests(OAuthTestsMixin, TestCase):
-    provider_id = TwitterProvider.id
+    provider_class = TwitterProvider
 
     def get_mocked_response(self):
         # FIXME: Replace with actual/complete Twitter response

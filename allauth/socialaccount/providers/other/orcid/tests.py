@@ -8,7 +8,7 @@ from .provider import OrcidProvider
 
 
 class OrcidTests(OAuth2TestsMixin, TestCase):
-    provider_id = OrcidProvider.id
+    provider_class = OrcidProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

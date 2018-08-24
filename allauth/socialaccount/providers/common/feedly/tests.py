@@ -5,7 +5,7 @@ from .provider import FeedlyProvider
 
 
 class FeedlyTests(OAuth2TestsMixin, TestCase):
-    provider_id = FeedlyProvider.id
+    provider_class = FeedlyProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

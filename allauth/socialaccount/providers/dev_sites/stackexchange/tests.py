@@ -5,7 +5,7 @@ from .provider import StackExchangeProvider
 
 
 class StackExchangeTests(OAuth2TestsMixin, TestCase):
-    provider_id = StackExchangeProvider.id
+    provider_class = StackExchangeProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

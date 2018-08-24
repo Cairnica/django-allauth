@@ -8,4 +8,4 @@ from .provider import TrelloProvider
 
 
 class TrelloTests(OAuthTestsMixin, TestCase):
-    provider_id = TrelloProvider.id
+    provider_class = TrelloProvider

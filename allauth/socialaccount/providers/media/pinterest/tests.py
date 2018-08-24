@@ -5,7 +5,7 @@ from .provider import PinterestProvider
 
 
 class PinterestTests(OAuth2TestsMixin, TestCase):
-    provider_id = PinterestProvider.id
+    provider_class = PinterestProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

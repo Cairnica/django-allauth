@@ -5,7 +5,7 @@ from .provider import AzureProvider
 
 
 class AzureTests(OAuth2TestsMixin, TestCase):
-    provider_id = AzureProvider.id
+    provider_class = AzureProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

@@ -5,7 +5,7 @@ from .provider import QuickBooksOAuth2Provider
 
 
 class QuickBooksOAuth2Tests(OAuth2TestsMixin, TestCase):
-    provider_id = QuickBooksOAuth2Provider.id
+    provider_class = QuickBooksOAuth2Provider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

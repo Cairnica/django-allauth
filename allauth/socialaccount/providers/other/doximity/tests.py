@@ -5,7 +5,7 @@ from .provider import DoximityProvider
 
 
 class DoximityTests(OAuth2TestsMixin, TestCase):
-    provider_id = DoximityProvider.id
+    provider_class = DoximityProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

@@ -10,7 +10,7 @@ from .provider import DropboxOAuth2Provider
 
 
 class DropboxOAuth2Tests(OAuth2TestsMixin, TestCase):
-    provider_id = DropboxOAuth2Provider.id
+    provider_class = DropboxOAuth2Provider
 
     def get_mocked_response(self):
         payload = {

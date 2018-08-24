@@ -5,7 +5,7 @@ from .provider import WindowsLiveProvider
 
 
 class WindowsLiveTests(OAuth2TestsMixin, TestCase):
-    provider_id = WindowsLiveProvider.id
+    provider_class = WindowsLiveProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

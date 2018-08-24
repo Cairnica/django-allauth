@@ -5,7 +5,7 @@ from allauth.tests import MockedResponse, TestCase
 
 
 class Auth0Tests(OAuth2TestsMixin, TestCase):
-    provider_id = Auth0Provider.id
+    provider_class = Auth0Provider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

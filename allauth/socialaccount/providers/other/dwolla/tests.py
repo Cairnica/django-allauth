@@ -5,7 +5,7 @@ from .provider import DwollaProvider
 
 
 class DwollaTests(OAuth2TestsMixin, TestCase):
-    provider_id = DwollaProvider.id
+    provider_class = DwollaProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """{

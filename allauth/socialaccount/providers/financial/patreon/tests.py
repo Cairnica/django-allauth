@@ -5,7 +5,7 @@ from .provider import PatreonProvider
 
 
 class PatreonTests(OAuth2TestsMixin, TestCase):
-    provider_id = PatreonProvider.id
+    provider_class = PatreonProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """{

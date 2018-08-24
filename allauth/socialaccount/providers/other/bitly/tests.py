@@ -5,7 +5,7 @@ from .provider import BitlyProvider
 
 
 class BitlyTests(OAuth2TestsMixin, TestCase):
-    provider_id = BitlyProvider.id
+    provider_class = BitlyProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """{

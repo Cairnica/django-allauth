@@ -5,7 +5,7 @@ from .provider import LinkedInOAuth2Provider
 
 
 class LinkedInOAuth2Tests(OAuth2TestsMixin, TestCase):
-    provider_id = LinkedInOAuth2Provider.id
+    provider_class = LinkedInOAuth2Provider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

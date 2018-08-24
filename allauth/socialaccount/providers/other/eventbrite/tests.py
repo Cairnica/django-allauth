@@ -9,7 +9,7 @@ class EventbriteTests(OAuth2TestsMixin, TestCase):
 
     """Test Class for Eventbrite OAuth2 v3."""
 
-    provider_id = EventbriteProvider.id
+    provider_class = EventbriteProvider
 
     def get_mocked_response(self):
         """Test authentication with an non-null image_id"""

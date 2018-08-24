@@ -8,7 +8,7 @@ from .provider import XingProvider
 
 
 class XingTests(OAuthTestsMixin, TestCase):
-    provider_id = XingProvider.id
+    provider_class = XingProvider
 
     def get_mocked_response(self):
         return [MockedResponse(200, """

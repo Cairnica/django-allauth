@@ -5,7 +5,7 @@ from .provider import EdmodoProvider
 
 
 class EdmodoTests(OAuth2TestsMixin, TestCase):
-    provider_id = EdmodoProvider.id
+    provider_class = EdmodoProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

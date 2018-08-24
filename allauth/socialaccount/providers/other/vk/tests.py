@@ -7,7 +7,7 @@ from .provider import VKProvider
 
 
 class VKTests(OAuth2TestsMixin, TestCase):
-    provider_id = VKProvider.id
+    provider_class = VKProvider
 
     def get_mocked_response(self, verified_email=True):
         return MockedResponse(200, """

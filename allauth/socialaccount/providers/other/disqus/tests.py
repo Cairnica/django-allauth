@@ -19,7 +19,7 @@ from .provider import DisqusProvider
     ACCOUNT_EMAIL_VERIFICATION=account_settings
     .EmailVerificationMethod.MANDATORY)
 class DisqusTests(OAuth2TestsMixin, TestCase):
-    provider_id = DisqusProvider.id
+    provider_class = DisqusProvider
 
     def get_mocked_response(self,
                             name='Raymond Penners',

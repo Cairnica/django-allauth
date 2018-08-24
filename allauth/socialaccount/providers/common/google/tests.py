@@ -28,7 +28,7 @@ from .provider import GoogleProvider
     ACCOUNT_EMAIL_VERIFICATION=account_settings
     .EmailVerificationMethod.MANDATORY)
 class GoogleTests(OAuth2TestsMixin, TestCase):
-    provider_id = GoogleProvider.id
+    provider_class = GoogleProvider
 
     def get_mocked_response(self,
                             family_name='Penners',

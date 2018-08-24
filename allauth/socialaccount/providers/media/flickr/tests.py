@@ -6,7 +6,7 @@ from .provider import FlickrProvider
 
 
 class FlickrTests(OAuthTestsMixin, TestCase):
-    provider_id = FlickrProvider.id
+    provider_class = FlickrProvider
 
     def get_mocked_response(self):
         #
@@ -51,7 +51,7 @@ class FlickrTests(OAuthTestsMixin, TestCase):
 
 class FlickrWithoutRealNameTests(OAuthTestsMixin, TestCase):
     """Separate test for Flickr accounts without real names"""
-    provider_id = FlickrProvider.id
+    provider_class = FlickrProvider
 
     def get_mocked_response(self):
         #

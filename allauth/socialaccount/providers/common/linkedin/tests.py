@@ -8,7 +8,7 @@ from .provider import LinkedInProvider
 
 
 class LinkedInTests(OAuthTestsMixin, TestCase):
-    provider_id = LinkedInProvider.id
+    provider_class = LinkedInProvider
 
     def get_mocked_response(self):
         return [MockedResponse(200, """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

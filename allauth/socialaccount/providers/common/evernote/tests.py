@@ -8,7 +8,7 @@ from .provider import EvernoteProvider
 
 
 class EvernoteTests(OAuthTestsMixin, TestCase):
-    provider_id = EvernoteProvider.id
+    provider_class = EvernoteProvider
 
     def get_mocked_response(self):
         return []

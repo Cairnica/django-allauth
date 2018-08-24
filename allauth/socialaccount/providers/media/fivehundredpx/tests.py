@@ -6,7 +6,7 @@ from .provider import FiveHundredPxProvider
 
 
 class FiveHundredPxTests(OAuthTestsMixin, TestCase):
-    provider_id = FiveHundredPxProvider.id
+    provider_class = FiveHundredPxProvider
 
     def get_mocked_response(self):
         return [MockedResponse(200, """{

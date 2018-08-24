@@ -5,7 +5,7 @@ from .provider import AmazonProvider
 
 
 class AmazonTests(OAuth2TestsMixin, TestCase):
-    provider_id = AmazonProvider.id
+    provider_class = AmazonProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

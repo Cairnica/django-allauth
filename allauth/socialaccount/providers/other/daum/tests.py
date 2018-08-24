@@ -7,7 +7,7 @@ from .provider import DaumProvider
 
 
 class DaumTests(OAuth2TestsMixin, TestCase):
-    provider_id = DaumProvider.id
+    provider_class = DaumProvider
 
     def get_mocked_response(self):
         result = dict()

@@ -26,7 +26,7 @@ from .provider import FacebookProvider
             'AUTH_PARAMS': {},
             'VERIFIED_EMAIL': False}})
 class FacebookTests(OAuth2TestsMixin, TestCase):
-    provider_id = FacebookProvider.id
+    provider_class = FacebookProvider
 
     facebook_data = """
         {

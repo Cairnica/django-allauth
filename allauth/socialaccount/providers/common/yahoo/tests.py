@@ -5,7 +5,7 @@ from .provider import YahooProvider
 
 
 class YahooTests(OAuth2TestsMixin, TestCase):
-    provider_id = YahooProvider.id
+    provider_class = YahooProvider
 
     def get_mocked_response(self):
         response_data = """

@@ -5,7 +5,7 @@ from .provider import WeiboProvider
 
 
 class WeiboTests(OAuth2TestsMixin, TestCase):
-    provider_id = WeiboProvider.id
+    provider_class = WeiboProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

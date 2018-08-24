@@ -4,7 +4,7 @@ from allauth.tests import MockedResponse, TestCase
 
 
 class DiscordTests(OAuth2TestsMixin, TestCase):
-    provider_id = DiscordProvider.id
+    provider_class = DiscordProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """{

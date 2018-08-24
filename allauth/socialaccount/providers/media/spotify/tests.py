@@ -8,7 +8,7 @@ from .provider import SpotifyOAuth2Provider
 
 
 class SpotifyOAuth2Tests(OAuth2TestsMixin, TestCase):
-    provider_id = SpotifyOAuth2Provider.id
+    provider_class = SpotifyOAuth2Provider
 
     def get_mocked_response(self):
         return MockedResponse(200, """{

@@ -5,7 +5,7 @@ from .provider import HubicProvider
 
 
 class HubicTests(OAuth2TestsMixin, TestCase):
-    provider_id = HubicProvider.id
+    provider_class = HubicProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

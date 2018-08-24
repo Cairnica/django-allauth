@@ -14,7 +14,7 @@ from .views import AuthentiqOAuth2Adapter
 
 
 class AuthentiqTests(OAuth2TestsMixin, TestCase):
-    provider_id = AuthentiqProvider.id
+    provider_class = AuthentiqProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, json.dumps({

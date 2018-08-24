@@ -10,7 +10,7 @@ from .views import _check_errors
 
 
 class BattleNetTests(OAuth2TestsMixin, TestCase):
-    provider_id = BattleNetProvider.id
+    provider_class = BattleNetProvider
     _uid = 123456789
     _battletag = "LuckyDragon#1953"
 

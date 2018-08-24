@@ -5,7 +5,7 @@ from .provider import LineProvider
 
 
 class LineTests(OAuth2TestsMixin, TestCase):
-    provider_id = LineProvider.id
+    provider_class = LineProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

@@ -9,7 +9,7 @@ class MailChimpTests(OAuth2TestsMixin, TestCase):
 
     """Test Class for MailChimp OAuth2 v3."""
 
-    provider_id = MailChimpProvider.id
+    provider_class = MailChimpProvider
 
     def get_mocked_response(self):
         """Test authentication with an non-null avatar."""

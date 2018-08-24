@@ -5,7 +5,7 @@ from .provider import FirefoxAccountsProvider
 
 
 class FirefoxAccountsTests(OAuth2TestsMixin, TestCase):
-    provider_id = FirefoxAccountsProvider.id
+    provider_class = FirefoxAccountsProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

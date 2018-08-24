@@ -5,7 +5,7 @@ from .provider import TwentyThreeAndMeProvider
 
 
 class TwentyThreeAndMeTests(OAuth2TestsMixin, TestCase):
-    provider_id = TwentyThreeAndMeProvider.id
+    provider_class = TwentyThreeAndMeProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

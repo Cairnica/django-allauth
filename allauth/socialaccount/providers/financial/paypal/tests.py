@@ -5,7 +5,7 @@ from .provider import PaypalProvider
 
 
 class PaypalTests(OAuth2TestsMixin, TestCase):
-    provider_id = PaypalProvider.id
+    provider_class = PaypalProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

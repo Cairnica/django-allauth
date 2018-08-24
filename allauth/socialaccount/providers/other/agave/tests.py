@@ -5,7 +5,7 @@ from .provider import AgaveProvider
 
 
 class AgaveTests(OAuth2TestsMixin, TestCase):
-    provider_id = AgaveProvider.id
+    provider_class = AgaveProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

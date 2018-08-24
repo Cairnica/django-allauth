@@ -5,7 +5,7 @@ from .provider import AngelListProvider
 
 
 class AngelListTests(OAuth2TestsMixin, TestCase):
-    provider_id = AngelListProvider.id
+    provider_class = AngelListProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

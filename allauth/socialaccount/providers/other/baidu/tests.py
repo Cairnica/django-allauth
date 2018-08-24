@@ -5,7 +5,7 @@ from .provider import BaiduProvider
 
 
 class BaiduTests(OAuth2TestsMixin, TestCase):
-    provider_id = BaiduProvider.id
+    provider_class = BaiduProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

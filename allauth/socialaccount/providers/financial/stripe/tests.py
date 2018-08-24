@@ -8,7 +8,7 @@ from .provider import StripeProvider
 
 
 class StripeTests(OAuth2TestsMixin, TestCase):
-    provider_id = StripeProvider.id
+    provider_class = StripeProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """{

@@ -5,7 +5,7 @@ from .provider import EveOnlineProvider
 
 
 class EveOnlineTests(OAuth2TestsMixin, TestCase):
-    provider_id = EveOnlineProvider.id
+    provider_class = EveOnlineProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

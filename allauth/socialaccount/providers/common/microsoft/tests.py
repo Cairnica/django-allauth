@@ -5,7 +5,7 @@ from .provider import MicrosoftGraphProvider
 
 
 class MicrosoftGraphTests(OAuth2TestsMixin, TestCase):
-    provider_id = MicrosoftGraphProvider.id
+    provider_class = MicrosoftGraphProvider
 
     def get_mocked_response(self):
         response_data = """

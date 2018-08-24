@@ -8,7 +8,7 @@ from .provider import MailRuProvider
 
 
 class MailRuTests(OAuth2TestsMixin, TestCase):
-    provider_id = MailRuProvider.id
+    provider_class = MailRuProvider
 
     def get_mocked_response(self, verified_email=True):
         return MockedResponse(200, """

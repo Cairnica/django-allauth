@@ -5,7 +5,7 @@ from allauth.tests import MockedResponse, TestCase
 
 
 class GitLabTests(OAuth2TestsMixin, TestCase):
-    provider_id = GitLabProvider.id
+    provider_class = GitLabProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

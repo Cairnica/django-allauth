@@ -5,7 +5,7 @@ from .provider import CernProvider
 
 
 class CernTests(OAuth2TestsMixin, TestCase):
-    provider_id = CernProvider.id
+    provider_class = CernProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

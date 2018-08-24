@@ -9,7 +9,7 @@ from .provider import OdnoklassnikiProvider
 
 
 class OdnoklassnikiTests(OAuth2TestsMixin, TestCase):
-    provider_id = OdnoklassnikiProvider.id
+    provider_class = OdnoklassnikiProvider
 
     def get_mocked_response(self, verified_email=True):
         return MockedResponse(200, """

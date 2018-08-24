@@ -5,7 +5,7 @@ from .provider import InstagramProvider
 
 
 class InstagramTests(OAuth2TestsMixin, TestCase):
-    provider_id = InstagramProvider.id
+    provider_class = InstagramProvider
 
     def get_mocked_response(self):
         return MockedResponse(200, """

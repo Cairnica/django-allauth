@@ -10,7 +10,6 @@ class TwentyThreeAndMeAccount(ProviderAccount):
 
 class TwentyThreeAndMeProvider(OAuth2Provider):
     id = 'twentythreeandme'
-    slug = '23andme'
     name = '23andMe'
     account_class = TwentyThreeAndMeAccount
     

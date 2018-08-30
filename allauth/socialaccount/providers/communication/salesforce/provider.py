@@ -63,5 +63,4 @@ class SalesforceProvider(OAuth2Provider):
                              verified=data.get('email_verified'))
         return [email]
 
-
-providers.registry.register(SalesforceProvider)
+provider_classes = [SalesforceProvider]

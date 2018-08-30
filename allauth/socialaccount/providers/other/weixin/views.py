@@ -10,7 +10,6 @@ from allauth.socialaccount.providers.core.oauth2.views import (
 from allauth.utils import build_absolute_uri
 
 from .client import WeixinOAuth2Client
-from .provider import WeixinProvider
 
 
 class WeixinOAuth2ClientMixin(object):
@@ -23,8 +22,8 @@ class WeixinOAuth2ClientMixin(object):
         scope = provider.get_scope(request)
         client = WeixinOAuth2Client(
             self.request, app.client_id, app.secret,
-            self.get_access_token_method(request),
-            self.get_access_token_url(request),
+            provider.get_access_token_method(request),
+            provider.get_access_token_url(request),
             callback_url,
             scope
         )

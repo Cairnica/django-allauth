@@ -3,15 +3,18 @@ from django.urls import reverse
 
 from openid.consumer import consumer
 
+from allauth.socialaccount.tests import ProviderTestsMixin, override_provider_settings
 from allauth.socialaccount.models import SocialAccount
 from allauth.tests import Mock, TestCase, patch
 from allauth.utils import get_user_model
 
 from . import views
+from .provider import OpenIDProvider
 from .utils import AXAttribute
 
 
-class OpenIDTests(TestCase):
+class OpenIDTests(ProviderTestsMixin, TestCase):
+    provider_class = OpenIDProvider
 
     def test_discovery_failure(self):
         """
@@ -19,15 +22,13 @@ class OpenIDTests(TestCase):
         DiscoveryFailure: No usable OpenID services found
         for http://www.google.com/
         """
-        resp = self.client.post(reverse('openid_login'),
-                                dict(openid='http://www.google.com'))
+        resp = self.client.post(reverse('openid_login'), dict(openid='http://www.google.com'))
         self.assertTrue('openid' in resp.context['form'].errors)
 
     def test_login(self):
-        resp = self.client.post(reverse(views.login),
-                                dict(openid='http://me.yahoo.com'))
+        resp = self.client.post(reverse(self.factory.login_view), dict(openid='http://me.yahoo.com'))
         assert 'login.yahooapis' in resp['location']
-        with patch('allauth.socialaccount.providers'
+        with patch('allauth.socialaccount.providers.core'
                    '.openid.views._openid_consumer') as consumer_mock:
             client = Mock()
             complete = Mock()
@@ -37,9 +38,9 @@ class OpenIDTests(TestCase):
             complete.return_value = complete_response
             complete_response.status = consumer.SUCCESS
             complete_response.identity_url = 'http://dummy/john/'
-            with patch('allauth.socialaccount.providers'
+            with patch('allauth.socialaccount.providers.core'
                        '.openid.utils.SRegResponse') as sr_mock:
-                with patch('allauth.socialaccount.providers'
+                with patch('allauth.socialaccount.providers.core'
                            '.openid.utils.FetchResponse') as fr_mock:
                     sreg_mock = Mock()
                     ax_mock = Mock()
@@ -55,20 +56,21 @@ class OpenIDTests(TestCase):
                     )
                     get_user_model().objects.get(first_name='raymond')
 
-    @override_settings(SOCIALACCOUNT_PROVIDERS={'openid': {'SERVERS': [
-        dict(id='yahoo',
-             name='Yahoo',
-             openid_url='http://me.yahoo.com',
-             extra_attributes=[
-                 ('phone', 'http://axschema.org/contact/phone/default', True,)
-             ])]}})
+    @override_provider_settings({'SERVERS': [
+        {
+            'id': 'yahoo',
+            'name': 'Yahoo',
+            'openid_url': 'http://me.yahoo.com',
+            'extra_attributes': [
+                ('phone', 'http://axschema.org/contact/phone/default', True,)
+            ]
+        }
+    ]})
     def test_login_with_extra_attributes(self):
-        with patch('allauth.socialaccount.providers.openid.views.QUERY_EMAIL',
-                   True):
-            resp = self.client.post(reverse(views.login),
-                                    dict(openid='http://me.yahoo.com'))
+        with patch('allauth.socialaccount.providers.core.openid.views.QUERY_EMAIL', True):
+            resp = self.client.post(reverse(self.factory.login_view), dict(openid='http://me.yahoo.com'))
         assert 'login.yahooapis' in resp['location']
-        with patch('allauth.socialaccount.providers'
+        with patch('allauth.socialaccount.providers.core'
                    '.openid.views._openid_consumer') as consumer_mock:
             client = Mock()
             complete = Mock()
@@ -81,9 +83,9 @@ class OpenIDTests(TestCase):
             complete_response.endpoint.server_url = 'http://me.yahoo.com'
             complete_response.status = consumer.SUCCESS
             complete_response.identity_url = 'http://dummy/john/'
-            with patch('allauth.socialaccount.providers'
+            with patch('allauth.socialaccount.providers.core'
                        '.openid.utils.SRegResponse') as sr_mock:
-                with patch('allauth.socialaccount.providers'
+                with patch('allauth.socialaccount.providers.core'
                            '.openid.utils.FetchResponse') as fr_mock:
                     sreg_mock = Mock()
                     ax_mock = Mock()
@@ -93,14 +95,12 @@ class OpenIDTests(TestCase):
                     ax_mock.return_value = {
                         AXAttribute.CONTACT_EMAIL: ['raymond@example.com'],
                         AXAttribute.PERSON_FIRST_NAME: ['raymond'],
-                        'http://axschema.org/contact/phone/default':
-                            ['123456789']}
+                        'http://axschema.org/contact/phone/default': ['123456789']
+                    }
                     resp = self.client.post(reverse('openid_callback'))
                     self.assertRedirects(
                         resp, "/accounts/profile/",
                         fetch_redirect_response=False
                     )
-                    socialaccount = \
-                        SocialAccount.objects.get(user__first_name='raymond')
-                    self.assertEqual(
-                        socialaccount.extra_data.get('phone'), '123456789')
+                    socialaccount = SocialAccount.objects.get(user__first_name='raymond')
+                    self.assertEqual(socialaccount.extra_data.get('phone'), '123456789')

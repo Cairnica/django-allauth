@@ -49,7 +49,8 @@ class LinkedInProvider(OAuthProvider):
     profile_url = 'https://api.linkedin.com/v1/people/~'
 
     def complete_login(self, request, app, token, response):
-        url = self.profile_url + ':(%s)' % ','.join(fields)
+        fields = self.get_profile_fields()
+        url = self.get_profile_url(request) + ':(%s)' % ','.join(fields)
         resp = requests.get(url, auth=self.get_auth_header(app, token))
         raw_xml = resp.text
         if not six.PY3:
@@ -85,7 +86,7 @@ class LinkedInProvider(OAuthProvider):
     def extract_common_fields(self, data):
         return dict(email=data.get('email-address'), first_name=data.get('first-name'), last_name=data.get('last-name'))
 
-        def to_dict(self, xml):
+    def to_dict(self, xml):
         """
         Convert XML structure to dict recursively, repeated keys
         entries are returned as in list containers.

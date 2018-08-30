@@ -20,7 +20,7 @@ class VimeoProvider(OAuthProvider):
 
     def complete_login(self, request, app, token, response):
         resp = requests.get(self.profile_url, self.get_auth_header(app, token))
-        extra_data = resp.json()
+        extra_data = resp.json()['person']
         return self.sociallogin_from_response(request, extra_data)
 
     def get_default_scope(self):

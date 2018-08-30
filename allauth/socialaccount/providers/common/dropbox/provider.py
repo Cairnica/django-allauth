@@ -40,5 +40,4 @@ class DropboxOAuth2Provider(OAuth2Provider):
             extra_data.json()
         )
 
-
-providers.registry.register(DropboxOAuth2Provider)
+provider_classes = [DropboxOAuth2Provider]

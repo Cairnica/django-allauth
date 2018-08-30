@@ -30,10 +30,13 @@ class GitHubProvider(OAuth2Provider):
     name = 'GitHub'
     account_class = GitHubAccount
     
-    access_token_url = '{GITHUB_URL}/login/oauth/access_token'
-    authorize_url = '{GITHUB_URL}/login/oauth/authorize'
-    profile_url = '{GITHUB_API_URL}/user'
-    emails_url = '{GITHUB_API_URL}/user/emails'
+    web_url = 'https://github.com'
+    api_url = 'https://api.github.com'
+
+    access_token_url = '{web_url}/login/oauth/access_token'
+    authorize_url = '{web_url}/login/oauth/authorize'
+    profile_url = '{api_url}/user'
+    emails_url = '{api_url}/user/emails'
 
     def get_default_scope(self):
         scope = []

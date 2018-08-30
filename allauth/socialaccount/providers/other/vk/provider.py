@@ -3,7 +3,30 @@ import requests
 from allauth.socialaccount import app_settings
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.core.oauth2.views import OAuth2Adapter
+
+
+USER_FIELDS = ['first_name',
+               'last_name',
+               'nickname',
+               'screen_name',
+               'sex',
+               'bdate',
+               'city',
+               'country',
+               'timezone',
+               'photo',
+               'photo_medium',
+               'photo_big',
+               'photo_max_orig',
+               'has_mobile',
+               'contacts',
+               'education',
+               'online',
+               'counters',
+               'relation',
+               'last_seen',
+               'activity',
+               'universities']
 
 
 class VKAccount(ProviderAccount):
@@ -28,7 +51,10 @@ class VKAccount(ProviderAccount):
         return name or super(VKAccount, self).to_str()
 
 
-class VKOAuth2Adapter(OAuth2Adapter):
+class VKProvider(OAuth2Provider):
+    id = 'vk'
+    name = 'VK'
+    account_class = VKAccount
     
     access_token_url = 'https://oauth.vk.com/access_token'
     authorize_url = 'https://oauth.vk.com/authorize'
@@ -43,22 +69,13 @@ class VKOAuth2Adapter(OAuth2Adapter):
         }
         if uid:
             params['user_ids'] = uid
-        resp = requests.get(self.get_profile_url(request),
-                            params=params)
+        resp = requests.get(self.get_profile_url(request), params=params)
         resp.raise_for_status()
         extra_data = resp.json()['response'][0]
         email = kwargs['response'].get('email')
         if email:
             extra_data['email'] = email
-        return self.sociallogin_from_response(request,
-                                                             extra_data)
-
-
-class VKProvider(OAuth2Provider):
-    id = 'vk'
-    name = 'VK'
-    account_class = VKAccount
-    adapter_class = VKOAuth2Adapter
+        return self.sociallogin_from_response(request, extra_data)
 
     def get_default_scope(self):
         scope = []

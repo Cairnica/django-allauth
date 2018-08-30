@@ -45,7 +45,7 @@ class FiveHundredPxProvider(OAuthProvider):
 
     def complete_login(self, request, app, token, response):
         resp = requests.get(self.profile_url, auth=self.get_auth_header(app, token))
-        extra_data = resp.json()
+        extra_data = resp.json()['user']
         return self.sociallogin_from_response(request, extra_data)
 
 

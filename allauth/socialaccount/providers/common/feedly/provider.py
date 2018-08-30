@@ -4,7 +4,6 @@ import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.core.oauth2.views import OAuth2Adapter
 
 
 class FeedlyAccount(ProviderAccount):
@@ -25,9 +24,9 @@ class FeedlyProvider(OAuth2Provider):
     account_class = FeedlyAccount
     
     HOST = 'cloud.feedly.com'
-    access_token_url = 'https://{HOST}/v3/auth/token' % host
-    authorize_url = 'https://{HOST}/v3/auth/auth' % host
-    profile_url = 'https://{HOST}/v3/profile' % host
+    access_token_url = 'https://{HOST}/v3/auth/token'
+    authorize_url = 'https://{HOST}/v3/auth/auth'
+    profile_url = 'https://{HOST}/v3/profile'
 
     def get_default_scope(self):
         return ['https://cloud.feedly.com/subscriptions']

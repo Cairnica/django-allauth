@@ -19,6 +19,8 @@ class PersonaProvider(Provider):
     name = 'Persona'
     account_class = PersonaAccount
 
+    audience = None
+
     class Factory(Provider.Factory):
         @view_property
         def persona_view(self):

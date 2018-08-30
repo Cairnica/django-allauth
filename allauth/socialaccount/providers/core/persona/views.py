@@ -10,13 +10,12 @@ from allauth.socialaccount.helpers import (
 from allauth.socialaccount.models import SocialLogin
 from allauth.socialaccount.providers.base import ProviderView
 
-from .provider import PersonaProvider
 
 class PersonaLogin(ProviderView):
     
     def post(self, request, *args, **kwargs):
         assertion = request.POST.get('assertion', '')
-        audience = self.provider.settings.get('AUDIENCE', None)
+        audience = self.provider.audience
         if audience is None:
             raise ImproperlyConfigured(
                 "No Persona audience configured. Please "
@@ -25,17 +24,16 @@ class PersonaLogin(ProviderView):
             )
 
         resp = requests.post('https://verifier.login.persona.org/verify', {'assertion': assertion, 'audience': audience})
-        
+        provider = self.provider
+
         try:
             resp.raise_for_status()
             extra_data = resp.json()
             if extra_data['status'] != 'okay':
-                return render_authentication_error(request, provider_id=PersonaProvider.id, extra_context={'response': extra_data})
+                return render_authentication_error(request, provider_id=provider.id, extra_context={'response': extra_data})
         except (ValueError, requests.RequestException) as e:
-            return render_authentication_error(request, provider_id=PersonaProvider.id, exception=e)
+            return render_authentication_error(request, provider_id=provider.id, exception=e)
 
-        login = providers.registry \
-            .by_id(PersonaProvider.id, request) \
-            .sociallogin_from_response(request, extra_data)
+        login = provider.sociallogin_from_response(request, extra_data)
         login.state = SocialLogin.state_from_request(request)
         return complete_social_login(request, login)

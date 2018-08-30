@@ -8,7 +8,6 @@ import unicodedata
 from collections import OrderedDict
 
 from django.contrib.auth import get_user_model
-from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import ValidationError, validate_email
@@ -257,6 +256,7 @@ def build_absolute_uri(request, location, protocol=None):
     the case where request is None.
     """
     from .account import app_settings as account_settings
+    from django.contrib.sites.models import Site
 
     if request is None:
         site = Site.objects.get_current()
@@ -294,3 +294,7 @@ def get_form_class(forms, form_id, default_form):
 
 def get_request_param(request, param, default=None):
     return request.POST.get(param) or request.GET.get(param, default)
+
+def to_snake_case(str):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', str)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()

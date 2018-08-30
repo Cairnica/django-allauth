@@ -1,8 +1,10 @@
 from django.urls import reverse
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.utils.http import urlencode
 
-from allauth.socialaccount.providers.base import Provider, ProviderAccount
+from allauth.socialaccount.providers.base import Provider, ProviderAccount, view_property
+
+from .views import DraugiemLoginView, DraugiemCallbackView
 
 
 class DraugiemAccount(ProviderAccount):
@@ -41,11 +43,23 @@ class DraugiemProvider(Provider):
     account_class = DraugiemAccount
 
     class Factory(Provider.Factory):
+        @view_property
+        def login_view(self):
+            return DraugiemLoginView
+
+        @view_property
+        def callback_view(self):
+            return DraugiemCallbackView
+
         def get_urlpatterns(self):
-            return [
-                url('^draugiem/login/$', views.login, name="draugiem_login"),
-                url('^draugiem/callback/$', views.callback, name='draugiem_callback'),
+            slug = self.slug
+
+            urlpatterns = [
+                url(r'^login/$', self.login_view, name=slug + "_login"),
+                url(r'^login/callback/$', self.callback_view, name=slug + "_callback"),
             ]
+
+            return [url('^' + slug + '/', include(urlpatterns))]
 
     def get_login_url(self, request, **kwargs):
         url = reverse(self.id + "_login")

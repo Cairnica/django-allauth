@@ -5,8 +5,8 @@ from django.test.utils import override_settings
 
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers import registry
-from allauth.socialaccount.tests import create_oauth2_tests
-from allauth.tests import MockedResponse, patch
+from allauth.socialaccount.tests import OAuth2TestsMixin
+from allauth.tests import MockedResponse, patch, TestCase
 
 from .provider import BitbucketOAuth2Provider
 
@@ -18,8 +18,8 @@ except ImportError:
 
 
 @override_settings(SOCIALACCOUNT_QUERY_EMAIL=True)
-class BitbucketOAuth2Tests(create_oauth2_tests(registry.by_id(
-        BitbucketOAuth2Provider.id))):
+class BitbucketOAuth2Tests(OAuth2TestsMixin, TestCase):
+    provider_class = BitbucketOAuth2Provider
 
     response_data = """
         {
@@ -94,8 +94,8 @@ class BitbucketOAuth2Tests(create_oauth2_tests(registry.by_id(
     def setUp(self):
         super(BitbucketOAuth2Tests, self).setUp()
         self.mocks = {
-            'requests': patch('allauth.socialaccount.providers'
-                              '.bitbucket_oauth2.views.requests')
+            'requests': patch('allauth.socialaccount.providers.dev_sites'
+                              '.bitbucket_oauth2.provider.requests')
         }
         self.patches = dict((name, mocked.start())
                             for (name, mocked) in self.mocks.items())
@@ -105,6 +105,7 @@ class BitbucketOAuth2Tests(create_oauth2_tests(registry.by_id(
         ]
 
     def tearDown(self):
+        super().tearDown()
         for (_, mocked) in self.mocks.items():
             mocked.stop()
 

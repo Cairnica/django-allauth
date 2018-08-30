@@ -8,13 +8,11 @@ from allauth.socialaccount.helpers import (
     render_authentication_error,
 )
 from allauth.socialaccount.models import SocialLogin, SocialToken
-from allauth.socialaccount.providers.base import ProviderView
+from allauth.socialaccount.providers.base import ProviderView, AuthAction, AuthError
 from allauth.socialaccount.providers.core.oauth.client import (
     OAuthClient,
     OAuthError,
 )
-
-from ..base import AuthAction, AuthError
 
 
 class OAuthView(ProviderView):

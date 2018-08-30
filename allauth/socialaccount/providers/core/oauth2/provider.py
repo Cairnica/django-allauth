@@ -1,14 +1,16 @@
+import re
 from datetime import timedelta
 
 from django.urls import reverse
 from django.conf.urls import include, url
+from django.template.base import Variable
 from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.functional import cached_property
 
 from allauth.compat import parse_qsl
 from allauth.socialaccount.providers.base import Provider, view_property
-from allauth.socialaccount.models import SocialLogin, SocialToken
+from allauth.socialaccount.models import SocialToken
 from allauth.utils import build_absolute_uri
 from allauth.utils import import_attribute
 
@@ -51,18 +53,25 @@ class OAuth2Provider(Provider):
 
             return [url('^' + slug + '/', include(urlpatterns))]
 
+    def get_access_token_method(self, request):
+        return self.access_token_method
+
+    def format_url(self, url):
+        def do_replace(match):
+            return Variable(match.group(1)).resolve(self)
+        return re.sub(r'{(.*?)}', do_replace, url)
 
     def get_access_token_url(self, callback_request):
         """ Get the remote URL to fetch the OAuth2 Token """
-        return self.access_token_url.format_map(self)
+        return self.format_url(self.access_token_url)
 
     def get_authorize_url(self, login_request):
         """ Get the remote URL begin OAuth2 Authorization """
-        return self.authorize_url.format_map(self)
+        return self.format_url(self.authorize_url)
 
     def get_profile_url(self, request):
         """ Get the remote URL to get the Profile """
-        return self.profile_url.format_map(self)
+        return self.format_url(self.profile_url)
 
     def get_login_url(self, request, **kwargs):
         """ Get the local URL to begin login """

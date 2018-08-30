@@ -66,7 +66,7 @@ class GoogleProvider(OAuth2Provider):
         resp = requests.get(self.get_profile_url(request), params={'access_token': token.token, 'alt': 'json'})
         resp.raise_for_status()
         extra_data = resp.json()
-        login = self.get_provider().sociallogin_from_response(request, extra_data)
+        login = self.sociallogin_from_response(request, extra_data)
         return login
 
 

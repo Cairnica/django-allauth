@@ -22,6 +22,8 @@ class Auth0Provider(OAuth2Provider):
 
     supports_state = True
 
+    AUTH0_URL = ""
+
     access_token_url = '{AUTH0_URL}/oauth/token'
     authorize_url = '{AUTH0_URL}/authorize'
     profile_url = '{AUTH0_URL}/userinfo'

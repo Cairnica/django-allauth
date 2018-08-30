@@ -23,6 +23,8 @@ class GlobusProvider(OAuth2Provider):
     name = 'Globus'
     account_class = GlobusAccount
     
+    provider_base_url = 'https://auth.globus.org/v2/oauth2'
+    
     access_token_url = '{provider_base_url}/token'
     authorize_url = '{provider_base_url}/authorize'
     profile_url = '{provider_base_url}/userinfo'

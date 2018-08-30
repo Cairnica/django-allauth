@@ -41,7 +41,7 @@ class AuthentiqProvider(OAuth2Provider):
     name = 'Authentiq'
     account_class = AuthentiqAccount
 
-    provider_url = 'https://connect.authentiq.io/'
+    provider_url = 'https://connect.authentiq.io'
 
     access_token_url = '{provider_url}/token'
     authorize_url = '{provider_url}/authorize'

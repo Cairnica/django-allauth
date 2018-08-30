@@ -10,6 +10,7 @@ from allauth.account.models import EmailAddress
 from allauth.socialaccount import app_settings
 
 from ..adapter import get_adapter
+from ...utils import to_snake_case
 
 
 class AuthProcess(object):
@@ -36,7 +37,7 @@ class ProviderException(Exception):
 def view_property(func):
     @functools.wraps(func)
     def new_func(self):
-        return func(self).adapter_view(self)
+        return func(self).provider_view(self)
     return cached_property(new_func)
 
 
@@ -44,25 +45,43 @@ class Provider(object):
     default_settings = None
     account_class = None
 
-    def __init__(self, factory, request=None):
+    def __init__(self, factory, request=None, **kwargs):
         self.factory = factory
         self.request = request
 
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
     class Factory():
-        def __init__(self, ProviderClass, id=None, **kwargs):
-            self.id = id or Provider.__name__
+        def __init__(self, ProviderClass, id=None, name=None, **kwargs):
+            if not id:
+                if hasattr(ProviderClass, 'id'):
+                    id = ProviderClass.id
+                else:
+                    id = ProviderClass.__name__
+                    if id.lower().endswith('provider'):
+                        id = id[0:-8]
+                    id = to_snake_case(id)
+
+            self.id = id
+            self.name = name or getattr(ProviderClass, 'name', ProviderClass.__name__)
             self.provider_class = ProviderClass
 
-        @property
-        def settings(self):
-            return dict().update(self.provider_class.default_settings, app_settings.PROVIDERS.get(self.id, {}))
+            # for key in kwargs:
+            #     if not hasattr(self.provider_class, key):
+            #         raise TypeError(f"{self.provider_class.__name__}() received an invalid setting {key}. Settings "
+            #                         "may only be arguments that are already "
+            #                         "attributes of the class.")
+
+            self.settings = kwargs
 
         @property
         def slug(self):
             return self.id
 
         def create_provider(self, current_request):
-            return self.provider_class(current_request)
+            new_instance = self.provider_class(self, current_request, **self.settings)
+            return new_instance
 
         def get_urlpatterns(self):
             try:
@@ -70,6 +89,9 @@ class Provider(object):
             except ImportError:
                 return []
             return getattr(prov_mod, 'urlpatterns', [])
+
+        def wrap_account(self, social_account):
+            return self.provider_class.account_class(social_account, self)
 
 
     @property
@@ -98,9 +120,6 @@ class Provider(object):
         Some providers may require extra scripts (e.g. a Facebook connect)
         """
         return ''
-
-    def wrap_account(self, social_account):
-        return self.account_class(social_account)
 
     def get_settings(self):
         return self.factory.settings
@@ -210,8 +229,9 @@ class Provider(object):
 
 @python_2_unicode_compatible
 class ProviderAccount(object):
-    def __init__(self, social_account):
+    def __init__(self, social_account, provider):
         self.account = social_account
+        self.provider = provider
 
     def get_profile_url(self):
         return None

@@ -60,8 +60,7 @@ class DisqusProvider(OAuth2Provider):
 
         extra_data = resp.json().get('response')
 
-        login = self.get_provider()\
-            .sociallogin_from_response(request, extra_data)
+        login = self.sociallogin_from_response(request, extra_data)
         return login
 
 

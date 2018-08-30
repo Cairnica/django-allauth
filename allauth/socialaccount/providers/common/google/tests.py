@@ -51,9 +51,6 @@ class GoogleTests(OAuth2TestsMixin, TestCase):
                (repr(verified_email).lower())))
 
     def test_google_compelete_login_401(self):
-        from allauth.socialaccount.providers.google.views import \
-            GoogleOAuth2Adapter
-
         class LessMockedResponse(MockedResponse):
             def raise_for_status(self):
                 if self.status_code != 200:
@@ -62,8 +59,7 @@ class GoogleTests(OAuth2TestsMixin, TestCase):
             reverse(self.provider.id + '_login'),
             dict(process='login'))
 
-        adapter = GoogleOAuth2Adapter(request)
-        app = adapter.get_provider().get_app(request)
+        app = self.provider.get_app(request)
         token = SocialToken(token='some_token')
         response_with_401 = LessMockedResponse(
             401, """
@@ -78,11 +74,11 @@ class GoogleTests(OAuth2TestsMixin, TestCase):
               "message": "Invalid Credentials" }
             }""")
         with patch(
-                'allauth.socialaccount.providers.google.views'
+                'allauth.socialaccount.providers.common.google.provider'
                 '.requests') as patched_requests:
             patched_requests.get.return_value = response_with_401
             with self.assertRaises(HTTPError):
-                adapter.complete_login(request, app, token)
+                self.provider.complete_login(request, app, token)
 
     def test_username_based_on_email(self):
         first_name = '明'

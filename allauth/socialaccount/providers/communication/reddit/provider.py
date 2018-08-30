@@ -16,6 +16,7 @@ class RedditProvider(OAuth2Provider):
     name = 'Reddit'
     account_class = RedditAccount
 
+    access_token_url = 'https://www.reddit.com/api/v1/access_token'
     authorize_url = 'https://www.reddit.com/api/v1/authorize'
     profile_url = 'https://oauth.reddit.com/api/v1/me'
     basic_auth = True

@@ -1,4 +1,4 @@
-import json
+import requests
 
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.core.oauth.provider import OAuthProvider

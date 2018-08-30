@@ -10,7 +10,6 @@ from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse, TestCase
 
 from .provider import AuthentiqProvider
-from .views import AuthentiqOAuth2Adapter
 
 
 class AuthentiqTests(OAuth2TestsMixin, TestCase):
@@ -39,14 +38,14 @@ class AuthentiqTests(OAuth2TestsMixin, TestCase):
         self.assertIn("email", scopes)
 
     def test_scopes(self):
-        request = RequestFactory().get(AuthentiqOAuth2Adapter.authorize_url)
+        request = RequestFactory().get('https://connect.authentiq.io/authorize')
         scopes = self.provider.get_scope(request)
         self.assertIn("openid", scopes)
         self.assertIn("aq:name", scopes)
 
     def test_dynamic_scopes(self):
         request = RequestFactory().get(
-            AuthentiqOAuth2Adapter.authorize_url,
+            'https://connect.authentiq.io/authorize',
             dict(scope="foo")
         )
         scopes = self.provider.get_scope(request)
@@ -60,7 +59,7 @@ class AuthentiqTests(OAuth2TestsMixin, TestCase):
         SOCIALACCOUNT_EMAIL_VERIFICATION=True,
     )
     def test_scopes_required_verified_email(self):
-        request = RequestFactory().get(AuthentiqOAuth2Adapter.authorize_url)
+        request = RequestFactory().get('https://connect.authentiq.io/authorize')
         scopes = self.provider.get_scope(request)
         self.assertIn("email~rs", scopes)
         self.assertNotIn("email", scopes)
@@ -71,7 +70,7 @@ class AuthentiqTests(OAuth2TestsMixin, TestCase):
         SOCIALACCOUNT_EMAIL_VERIFICATION=True,
     )
     def test_scopes_optional_verified_email(self):
-        request = RequestFactory().get(AuthentiqOAuth2Adapter.authorize_url)
+        request = RequestFactory().get('https://connect.authentiq.io/authorize')
         scopes = self.provider.get_scope(request)
         self.assertIn("email~s", scopes)
         self.assertNotIn("email", scopes)
@@ -82,7 +81,7 @@ class AuthentiqTests(OAuth2TestsMixin, TestCase):
         SOCIALACCOUNT_EMAIL_VERIFICATION=False,
     )
     def test_scopes_required_email(self):
-        request = RequestFactory().get(AuthentiqOAuth2Adapter.authorize_url)
+        request = RequestFactory().get('https://connect.authentiq.io/authorize')
         scopes = self.provider.get_scope(request)
         self.assertIn("email~r", scopes)
         self.assertNotIn("email", scopes)
@@ -93,6 +92,6 @@ class AuthentiqTests(OAuth2TestsMixin, TestCase):
         SOCIALACCOUNT_EMAIL_VERIFICATION=False,
     )
     def test_scopes_optional_email(self):
-        request = RequestFactory().get(AuthentiqOAuth2Adapter.authorize_url)
+        request = RequestFactory().get('https://connect.authentiq.io/authorize')
         scopes = self.provider.get_scope(request)
         self.assertIn("email", scopes)

@@ -42,9 +42,8 @@ class QuickBooksOAuth2Provider(OAuth2Provider):
         }
         QBO_sandbox = self.get_settings().get('SANDBOX', False)
         url = self.profile_test if QBO_sandbox else self.get_profile_url(request)
-        extra_data = requests.get(url, headers=headers)
-        return self.sociallogin_from_response(
-            request, extra_data)
+        extra_data = requests.get(url, headers=headers).json()
+        return self.sociallogin_from_response(request, extra_data)
 
     def extract_uid(self, data):
         if 'sub' not in data:

@@ -7,28 +7,22 @@ from django.utils.http import urlencode
 
 from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialApp, SocialToken
+from allauth.socialaccount.tests import ProviderTestsMixin
 from allauth.tests import Mock, TestCase, patch
 
 from . import views
 from .provider import DraugiemProvider
 
 
-class DraugiemTests(TestCase):
+class DraugiemTests(ProviderTestsMixin, TestCase):
+    provider_class = DraugiemProvider
+    
     def setUp(self):
         # workaround to create a session. see:
         # https://code.djangoproject.com/ticket/11475
-        User.objects.create_user(
-            'anakin', 'skywalker@deathstar.example.com', 's1thrul3s')
+        super().setUp()
+        User.objects.create_user('anakin', 'skywalker@deathstar.example.com', 's1thrul3s')
         self.client.login(username='anakin', password='s1thrul3s')
-
-        self.provider = providers.registry.by_id(DraugiemProvider.id)
-        app = SocialApp.objects.create(provider=self.provider.id,
-                                       name=self.provider.id,
-                                       client_id='app123id',
-                                       key=self.provider.id,
-                                       secret='dummy')
-        app.sites.add(Site.objects.get_current())
-        self.app = app
 
     def get_draugiem_login_response(self):
         """
@@ -78,8 +72,8 @@ class DraugiemTests(TestCase):
         session.save()
 
     def test_login_redirect(self):
-        response = self.client.get(reverse(views.login))
-        redirect_url = reverse(views.callback)
+        response = self.client.get(reverse(self.factory.login_view))
+        redirect_url = reverse(self.factory.callback_view)
         full_redirect_url = "http://testserver" + redirect_url
         secret = self.app.secret + full_redirect_url
         redirect_url_hash = md5(secret.encode("utf-8")).hexdigest()
@@ -93,19 +87,19 @@ class DraugiemTests(TestCase):
                              fetch_redirect_response=False)
 
     def test_callback_no_auth_status(self):
-        response = self.client.get(reverse(views.callback))
+        response = self.client.get(reverse(self.factory.callback_view))
         self.assertTemplateUsed(response,
                                 "socialaccount/authentication_error.html")
 
     def test_callback_invalid_auth_status(self):
-        response = self.client.get(reverse(views.callback),
+        response = self.client.get(reverse(self.factory.callback_view),
                                    {'dr_auth_status': 'fail'})
         self.assertTemplateUsed(response,
                                 "socialaccount/authentication_error.html")
 
     def test_callback(self):
         with patch(
-                'allauth.socialaccount.providers.draugiem.views'
+                'allauth.socialaccount.providers.other.draugiem.views'
                 '.draugiem_complete_login') as draugiem_complete_login:
             self.mock_socialaccount_state()
 
@@ -117,7 +111,7 @@ class DraugiemTests(TestCase):
             draugiem_complete_login.return_value = login
 
             response = self.client.get(
-                reverse(views.callback),
+                reverse(self.factory.callback_view),
                 {'dr_auth_status': 'ok',
                  'dr_auth_code': '42'})
             self.assertRedirects(response, '/accounts/profile/',

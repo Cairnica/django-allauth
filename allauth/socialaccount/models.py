@@ -14,7 +14,7 @@ from allauth.account.models import EmailAddress
 from allauth.account.utils import get_next_redirect_url, setup_user_email
 from allauth.utils import get_user_model
 
-from . import app_settings, providers
+from . import app_settings
 from ..utils import get_request_param
 from .adapter import get_adapter
 from .fields import JSONField
@@ -41,8 +41,8 @@ class SocialApp(models.Model):
     objects = SocialAppManager()
 
     provider = models.CharField(verbose_name=_('provider'),
-                                max_length=30,
-                                choices=providers.registry.as_choices())
+                                max_length=30)
+                                # choices=providers.registry.as_choices())
     name = models.CharField(verbose_name=_('name'),
                             max_length=40)
     client_id = models.CharField(verbose_name=_('client id'),
@@ -75,8 +75,8 @@ class SocialAccount(models.Model):
     user = models.ForeignKey(allauth.app_settings.USER_MODEL,
                              on_delete=models.CASCADE)
     provider = models.CharField(verbose_name=_('provider'),
-                                max_length=30,
-                                choices=providers.registry.as_choices())
+                                max_length=30)
+                                # choices=providers.registry.as_choices())
     # Just in case you're wondering if an OpenID identity URL is going
     # to fit in a 'uid':
     #
@@ -119,6 +119,7 @@ class SocialAccount(models.Model):
         return self.get_provider_account().get_avatar_url()
 
     def get_provider(self):
+        from . import providers
         return providers.registry.by_id(self.provider)
 
     def get_provider_account(self):

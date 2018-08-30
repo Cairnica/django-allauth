@@ -5,8 +5,7 @@ from allauth.socialaccount.providers.core.oauth2.client import OAuth2Error
 from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse, TestCase
 
-from .provider import BattleNetProvider
-from .views import _check_errors
+from .provider import BattleNetProvider, _check_errors
 
 
 class BattleNetTests(OAuth2TestsMixin, TestCase):

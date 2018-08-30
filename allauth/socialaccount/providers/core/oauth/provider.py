@@ -1,12 +1,14 @@
+import re
 from requests_oauthlib import OAuth1
 
 from django.urls import reverse
 from django.conf.urls import include, url
+from django.template.base import Variable
 from django.utils.http import urlencode
 from django.utils.functional import cached_property
 
 from allauth.compat import parse_qsl
-from allauth.socialaccount.providers.base import Provider
+from allauth.socialaccount.providers.base import Provider, view_property
 from allauth.utils import import_attribute
 
 from .views import OAuthLoginView, OAuthCallbackView
@@ -21,13 +23,13 @@ class OAuthProvider(Provider):
     profile_url = None
 
     class Factory(Provider.Factory):
-        @cached_property
+        @view_property
         def login_view(self):
-            return self.login_view_class.adapter_view(self)
+            return self.provider_class.login_view_class
 
-        @cached_property
+        @view_property
         def callback_view(self):
-            return self.callback_view_class.adapter_view(self)
+            return self.provider_class.callback_view_class
 
         def get_urlpatterns(self):
             slug = self.slug
@@ -38,6 +40,27 @@ class OAuthProvider(Provider):
             ]
 
             return [url('^' + slug + '/', include(urlpatterns))]
+
+    def format_url(self, url):
+        def do_replace(match):
+            return Variable(match.group(1)).resolve(self)
+        return re.sub(r'{(.*?)}', do_replace, url)
+
+    def get_request_token_url(self, callback_request):
+        """ Get the remote URL to fetch the OAuth2 Token """
+        return self.format_url(self.request_token_url)
+
+    def get_access_token_url(self, callback_request):
+        """ Get the remote URL to fetch the OAuth2 Token """
+        return self.format_url(self.access_token_url)
+
+    def get_authorize_url(self, login_request):
+        """ Get the remote URL begin OAuth2 Authorization """
+        return self.format_url(self.authorize_url)
+
+    def get_profile_url(self, request):
+        """ Get the remote URL to get the Profile """
+        return self.format_url(self.profile_url)
 
     def get_login_url(self, request, **kwargs):
         url = reverse(self.slug + "_login")
@@ -67,8 +90,8 @@ class OAuthProvider(Provider):
 
     def get_auth_header(self, social_app, access_token):
         return OAuth1(
-            social_app.consumer_key,
-            client_secret=social_app.secret_key,
+            social_app.client_id,
+            client_secret=social_app.secret,
             resource_owner_key=access_token.token,
             resource_owner_secret=access_token.token_secret
         )

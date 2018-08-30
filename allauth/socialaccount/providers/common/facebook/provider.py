@@ -1,4 +1,7 @@
 import json
+import requests
+import hashlib
+import hmac
 
 from django.conf import settings
 from django.conf.urls import url
@@ -13,24 +16,32 @@ from django.utils.http import urlquote
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.app_settings import QUERY_EMAIL
 from allauth.socialaccount.providers.base import (
+    view_property,
     AuthAction,
     AuthProcess,
     ProviderAccount,
 )
 from allauth.socialaccount.providers.core.oauth2.provider import OAuth2Provider
-from allauth.socialaccount.providers.core.oauth2.views import OAuth2Adapter
 from allauth.utils import import_callable
 
 from .locale import get_default_locale_callable
 from . import views
 
 
-GRAPH_API_VERSION = getattr(settings, 'SOCIALACCOUNT_PROVIDERS', {}).get(
-    'facebook', {}).get('VERSION', 'v2.12')
-GRAPH_API_URL = 'https://graph.facebook.com/' + GRAPH_API_VERSION
-
 NONCE_SESSION_KEY = 'allauth_facebook_nonce'
 NONCE_LENGTH = 32
+
+
+def compute_appsecret_proof(app, token):
+    # Generate an appsecret_proof parameter to secure the Graph API call
+    # see https://developers.facebook.com/docs/graph-api/securing-requests
+    msg = token.token.encode('utf-8')
+    key = app.secret.encode('utf-8')
+    appsecret_proof = hmac.new(
+        key,
+        msg,
+        digestmod=hashlib.sha256).hexdigest()
+    return appsecret_proof
 
 
 class FacebookAccount(ProviderAccount):
@@ -41,7 +52,7 @@ class FacebookAccount(ProviderAccount):
         uid = self.account.uid
         # ask for a 600x600 pixel image. We might get smaller but
         # image will always be highest res possible and square
-        return GRAPH_API_URL + '/%s/picture?type=square&height=600&width=600&return_ssl_resources=1' % uid  # noqa
+        return self.provider.base_graph_url + '/%s/picture?type=square&height=600&width=600&return_ssl_resources=1' % uid  # noqa
 
     def to_str(self):
         dflt = super(FacebookAccount, self).to_str()
@@ -53,15 +64,48 @@ class FacebookProvider(OAuth2Provider):
     name = 'Facebook'
     account_class = FacebookAccount
 
-    @classmethod
-    def get_urlpatterns(cls):
-        return super().get_urlpatterns() + [
-            url(r'^facebook/login/token/$', views.login_by_token, name="facebook_login_by_token"),
-        ]
+    graph_api_version = 'v2.12'
 
-    def __init__(self, request):
+    authorize_url = 'https://www.facebook.com/{graph_api_version}/dialog/oauth'
+    access_token_url = 'https://graph.facebook.com/{graph_api_version}/oauth/access_token'
+    expires_in_key = 'expires_in'
+
+    class Factory(OAuth2Provider.Factory):
+
+        @view_property
+        def token_login_view(self):
+            return views.FacebookLoginByTokenView
+
+        def get_urlpatterns(self):
+            return super().get_urlpatterns() + [
+                url(r'^facebook/login/token/$', self.token_login_view, name="facebook_login_by_token"),
+            ]
+
+        @property
+        def base_graph_url(self):
+            api_version = self.settings.get('graph_api_version', 'v2.12')
+            return 'https://graph.facebook.com/{graph_api_version}'
+
+    def __init__(self, *args, **kwargs):
         self._locale_callable_cache = None
-        super(FacebookProvider, self).__init__(request)
+        super(FacebookProvider, self).__init__(*args, **kwargs)
+
+    @property
+    def base_graph_url(self):
+        return self.format_url('https://graph.facebook.com/{graph_api_version}')
+
+    def complete_login(self, request, app, access_token, **kwargs):
+        resp = requests.get(
+            self.base_graph_url + '/me',
+            params={
+                'fields': ','.join(self.get_fields()),
+                'access_token': access_token.token,
+                'appsecret_proof': compute_appsecret_proof(app, access_token)
+            })
+        resp.raise_for_status()
+        extra_data = resp.json()
+        login = self.sociallogin_from_response(request, extra_data)
+        return login
 
     def get_method(self):
         return self.get_settings().get('METHOD', 'oauth2')
@@ -119,8 +163,7 @@ class FacebookProvider(OAuth2Provider):
         return settings.get('FIELDS', default_fields)
 
     def get_auth_params(self, request, action):
-        ret = super(FacebookProvider, self).get_auth_params(request,
-                                                            action)
+        ret = super(FacebookProvider, self).get_auth_params(request, action)
         if action == AuthAction.REAUTHENTICATE:
             ret['auth_type'] = 'reauthenticate'
         return ret
@@ -128,7 +171,7 @@ class FacebookProvider(OAuth2Provider):
     def get_init_params(self, request, app):
         init_params = {
             'appId': app.client_id,
-            'version': GRAPH_API_VERSION
+            'version': self.graph_api_version
         }
         settings = self.get_settings()
         init_params.update(settings.get('INIT_PARAMS', {}))
@@ -158,7 +201,7 @@ class FacebookProvider(OAuth2Provider):
 
         fb_data = {
             "appId": app.client_id,
-            "version": GRAPH_API_VERSION,
+            "version": self.graph_api_version,
             "locale": locale,
             "initParams": self.get_init_params(request, app),
             "loginOptions": self.get_fb_login_options(request),
@@ -172,8 +215,7 @@ class FacebookProvider(OAuth2Provider):
             "csrfToken": get_token(request)
         }
         ctx = {'fb_data': mark_safe(json.dumps(fb_data))}
-        return render_to_string('facebook/fbconnect.html', ctx,
-                                request=request)
+        return render_to_string('facebook/fbconnect.html', ctx, request=request)
 
     def get_nonce(self, request, or_create=False, pop=False):
         if pop:
